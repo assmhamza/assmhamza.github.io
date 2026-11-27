@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>منصة البرمجة | مستر عاصم حمزة</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4338ca">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="منصة البرمجة">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
 <script>/**
  * Skipped minification because the original files appears to be already minified.
  * Original file: /npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js
@@ -142,6 +148,8 @@ input[type=range]{width:100%}
 .btn.ok{background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 4px 14px rgba(21,128,61,.25)}
 .badge{white-space:nowrap}
 .gtab{display:grid;gap:8px}.grow2{border:1.5px solid var(--line);border-radius:12px;padding:10px}.grow2.ok{border-color:#86efac;background:#f0fdf4}.grow2.bad{border-color:#fca5a5;background:#fef2f2}.trow2{border:1.5px dashed var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+.anbar{margin:10px 0}.anl{display:flex;justify-content:space-between;gap:8px;font-size:.9rem;margin-bottom:4px}.ant{height:10px;background:#e8ebf5;border-radius:99px;overflow:hidden}.anf{height:100%;border-radius:99px}.anrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.lnum{width:34px;height:34px;border-radius:50%;background:#e0e7ff;color:#4338ca;display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex:none}.lnum.dn{background:#dcfce7;color:#15803d}.lsn.lk{opacity:.65}.qitem{border:1.5px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}.qans{background:#f0fdf4;border-radius:10px;padding:10px;margin-top:8px}
 .bdgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .bdg{border:1.5px solid var(--line);border-radius:14px;padding:12px;text-align:center;opacity:.5;filter:grayscale(1)}
 .bdg.on{opacity:1;filter:none;border-color:#fcd34d;background:#fffbeb}
@@ -385,6 +393,7 @@ const sb = window.supabase.createClient(CFG.url, CFG.anon);
 
 /* ================= SVG icon set ================= */
 const ICONS={
+chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
 home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.8V20a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9.8"/>',
 users:'<circle cx="9" cy="8" r="3.4"/><path d="M2.8 20c.8-3.2 3.3-5 6.2-5s5.4 1.8 6.2 5"/><path d="M15.5 4.8a3.4 3.4 0 0 1 0 6.6"/><path d="M17.2 15.3c2 .6 3.4 2 3.9 4.7"/>',
 user:'<circle cx="12" cy="8" r="4"/><path d="M4.5 21c1-4 3.9-6 7.5-6s6.5 2 7.5 6"/>',
@@ -471,9 +480,23 @@ function heroHTML(sub, small){
     ${sub?`<div class="sub">${esc(sub)}</div>`:''}
   </div>`;
 }
+/* ===================== تثبيت التطبيق (PWA) ===================== */
+let pwaEv=null;
+const pwaStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const pwaIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+function pwaCanShow(){ return !pwaStandalone()&&(!!pwaEv||pwaIOS()); }
+function pwaRefresh(){ document.querySelectorAll('.pwa-btn').forEach(b=>b.style.display=pwaCanShow()?'inline-flex':'none'); }
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); pwaEv=e; pwaRefresh(); });
+window.addEventListener('appinstalled',()=>{ pwaEv=null; pwaRefresh(); toast('اتثبّت التطبيق'); });
+async function pwaInstall(){
+  if(pwaEv){ pwaEv.prompt(); try{await pwaEv.userChoice;}catch(e){} pwaEv=null; pwaRefresh(); return; }
+  if(pwaIOS()) alert('علشان تثبّت التطبيق على الأيفون:\n1) افتح الموقع من Safari\n2) دوس زر المشاركة (المربع اللي فيه سهم لفوق)\n3) اختار "إضافة إلى الشاشة الرئيسية"');
+}
+if('serviceWorker' in navigator && /\.github\.io$/.test(location.hostname)) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 function footHTML(){
   return `<div class="foot"><div class="fline"></div>
     إعداد وتطوير <b>${esc(S.brand.name)}</b><br>${esc(brandLine())} · ${esc(S.brand.grade)}
+    <div style="margin-top:10px"><button class="btn sm sec pwa-btn" style="display:${pwaCanShow()?'inline-flex':'none'}" onclick="pwaInstall()">${ic('dl',15)} ثبّت التطبيق على موبايلك</button></div>
   </div>`;
 }
 
@@ -662,7 +685,7 @@ async function viewStudent(tab){
   if(S.profile && S.profile.active===false) return viewStudentPending();
   S.tab=tab;
   const p=S.profile;
-  const tabs=[['home','الرئيسية','home'],['att','حضوري','att'],['grades','درجاتي','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['py','محرر بايثون','code'],['rank','الترتيب والشارات','medal'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['tools','أدوات ذكية','spark']];
+  const tabs=[['home','الرئيسية','home'],['att','حضوري','att'],['grades','درجاتي','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['py','محرر بايثون','code'],['rank','الترتيب والشارات','medal'],['lessons','مسار الدروس','book'],['ask','اسأل المدرس','chat'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['tools','أدوات ذكية','spark']];
   root.innerHTML=`
   ${heroHTML('أهلًا '+p.name.split(' ')[0]+' · '+(p.group_name?'شعبة '+p.group_name:S.brand.grade), true)}
   <div class="wrap shellwrap mt"><div class="shell">
@@ -680,6 +703,8 @@ async function viewStudent(tab){
     else if(tab==='hw') await sHw(body);
     else if(tab==='py') await studentPy(body);
     else if(tab==='rank') await sRank(body);
+    else if(tab==='lessons') await sLessons(body);
+    else if(tab==='ask') await sAsk(body);
     else if(tab==='files') await studentFiles(body);
     else if(tab==='ann') await studentAnn(body);
     else if(tab==='tools') await studentTools(body);
@@ -1062,7 +1087,7 @@ async function doTeacherLogin(){
 }
 
 /* ================= teacher shell ================= */
-const TTABS=[['home','الرئيسية','home'],['students','الطلاب','users'],['att','الحضور','att'],['grades','الدرجات','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['rank','الترتيب والشارات','medal'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['settings','الإعدادات','gear']];
+const TTABS=[['home','الرئيسية','home'],['students','الطلاب','users'],['att','الحضور','att'],['grades','الدرجات','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['rank','الترتيب والشارات','medal'],['an','التحليلات','chart'],['lessons','الدروس','book'],['qa','الأسئلة','chat'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['settings','الإعدادات','gear']];
 function viewTeacher(tab){
   S.tab=tab;
   root.innerHTML=`
@@ -1074,7 +1099,7 @@ function viewTeacher(tab){
     ${footHTML()}</div>
   </div></div>`;
   const body=document.getElementById('tbody');
-  const fn={home:tHome,students:tStudents,att:tAtt,grades:tGrades,exams:tExams,hw:tHw,rank:tRank,files:tFiles,ann:tAnn,settings:tSettings}[tab];
+  const fn={home:tHome,students:tStudents,att:tAtt,grades:tGrades,exams:tExams,hw:tHw,rank:tRank,an:tAnalytics,lessons:tLessons,qa:tQuestions,files:tFiles,ann:tAnn,settings:tSettings}[tab];
   Promise.resolve(fn(body)).catch(e=>{body.innerHTML='<div class="card center"><p>'+esc(errMsg(e))+'</p></div>';});
 }
 
@@ -2166,6 +2191,141 @@ async function tHwVerify(id){
     toast('اتراجعت '+n+' تسليم'); tHwOpen(id);
   }catch(e){ toast(errMsg(e),true); btn.disabled=false; btn.textContent='راجع كل التسليمات'; }
 }
+/* ===================== التحليلات ===================== */
+function anBar(label,pct,txt,col){pct=Math.max(0,Math.min(100,Math.round(pct)));return `<div class="anbar"><div class="anl"><span>${esc(label)}</span><b>${esc(txt)}</b></div><div class="ant"><div class="anf" style="width:${pct}%;background:${col||'var(--pri)'}"></div></div></div>`;}
+function anCol(p){return p>=75?'#16a34a':p>=50?'#f59e0b':'#dc2626';}
+async function tAnalytics(body){
+  let [students,att,hws,subs,asm,scores,exams,qs,attempts]=await Promise.all([
+    api(sb.from('students').select('id,name,group_name,active')),
+    api(sb.from('attendance').select('student_id,day,status')),
+    api(sb.from('hw').select('id,title,due_at,group_name,max_score')),
+    api(sb.from('hw_submissions').select('hw_id,student_id,score,graded_at')),
+    api(sb.from('assessments').select('id,title,max_score')),
+    api(sb.from('scores').select('assessment_id,score')),
+    api(sb.from('exams').select('id,title')),
+    api(sb.from('exam_questions').select('id,exam_id,question,qtype,correct_index,correct_answers')),
+    api(sb.from('exam_attempts').select('exam_id,student_id,score,total,answers')),
+  ]);
+  students=students||[];att=att||[];hws=hws||[];subs=subs||[];asm=asm||[];scores=scores||[];exams=exams||[];qs=qs||[];attempts=attempts||[];
+  const act=students.filter(s=>s.active), pend=students.length-act.length;
+  const nm=id=>{const s=students.find(x=>x.id===id);return s?s.name:'؟'};
+  // الحضور لكل مجموعة
+  const gs=[...new Set(students.map(s=>s.group_name||'بدون مجموعة'))];
+  const gAtt=gs.map(g=>{const ids=new Set(students.filter(s=>(s.group_name||'بدون مجموعة')===g).map(s=>s.id));const r=att.filter(a=>ids.has(a.student_id));const p=r.filter(a=>a.status!=='absent').length;return {g,n:r.length,pct:r.length?p*100/r.length:null};});
+  // الغياب الكتير
+  const ab={};att.forEach(a=>{if(a.status==='absent')ab[a.student_id]=(ab[a.student_id]||0)+1;});
+  const manyAbs=Object.entries(ab).filter(([id,c])=>c>=3&&students.find(s=>s.id===id&&s.active)).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  // واجبات متأخرة
+  const now=Date.now(), subSet=new Set(subs.map(s=>s.hw_id+'|'+s.student_id));
+  const lateMiss=[];act.forEach(s=>{const n=hws.filter(h=>new Date(h.due_at)<now&&(!h.group_name||h.group_name===s.group_name)&&!subSet.has(h.id+'|'+s.id)).length;if(n)lateMiss.push([s.name,n]);});
+  lateMiss.sort((a,b)=>b[1]-a[1]);
+  // نسبة تسليم كل واجب
+  const hwRate=hws.slice().sort((a,b)=>new Date(b.due_at)-new Date(a.due_at)).slice(0,8).map(h=>{const el=act.filter(s=>!h.group_name||h.group_name===s.group_name).length;const d=subs.filter(s=>s.hw_id===h.id).length;return {t:h.title,d,el,pct:el?Math.min(100,d*100/el):0};});
+  // متوسط التقييمات
+  const asmAvg=asm.map(a=>{const sc=scores.filter(s=>s.assessment_id===a.id&&s.score!=null);const avg=sc.length?sc.reduce((x,y)=>x+Number(y.score),0)/sc.length:null;return {t:a.title,n:sc.length,avg,max:Number(a.max_score),pct:avg==null?null:avg*100/Number(a.max_score)};}).filter(x=>x.n).slice(-8);
+  // أضعف أسئلة الاختبارات
+  const qStat=qs.map(q=>{let n=0,c=0;attempts.filter(a=>a.exam_id===q.exam_id&&a.answers).forEach(a=>{const av=a.answers[q.id];if(av==null||av==='')return;n++;if(q.qtype==='fill'){if((q.correct_answers||[]).some(x=>normAns(x)===normAns(String(av))))c++;}else if(Number(av)===q.correct_index)c++;});return {q:q.question,ex:(exams.find(e=>e.id===q.exam_id)||{}).title||'',n,pct:n?c*100/n:null};}).filter(x=>x.n>=1).sort((a,b)=>a.pct-b.pct).slice(0,6);
+  const card=(ti,ic2,inner)=>`<div class="card"><div class="sec-title"><span class="tic">${ic(ic2,17)}</span><h3>${ti}</h3></div>${inner}</div>`;
+  const empty='<p class="mut">لسه مفيش بيانات كفاية.</p>';
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('chart',17)}</span><h3>التحليلات</h3></div>
+    <div class="grid4"><div class="stat"><div class="big">${act.length}</div><div class="lbl">طالب مفعّل</div></div><div class="stat"><div class="big">${pend}</div><div class="lbl">مستني التفعيل</div></div><div class="stat"><div class="big">${hws.length}</div><div class="lbl">واجب</div></div><div class="stat"><div class="big">${attempts.length}</div><div class="lbl">محاولة اختبار</div></div></div></div>`
+  +card('نسبة الحضور لكل مجموعة','att',gAtt.some(x=>x.n)?gAtt.filter(x=>x.n).map(x=>anBar(x.g,x.pct,Math.round(x.pct)+'%',anCol(x.pct))).join(''):empty)
+  +card('طلبة غيابهم كتير (3 مرات أو أكتر)','users',manyAbs.length?manyAbs.map(([id,c])=>`<div class="anrow"><span>${esc(nm(id))}</span><span class="badge r">${c} غياب</span></div>`).join(''):'<p class="mut">مفيش حد غيابه كتير.</p>')
+  +card('واجبات فات موعدها ومتسلمتش','clip',lateMiss.length?lateMiss.slice(0,8).map(x=>`<div class="anrow"><span>${esc(x[0])}</span><span class="badge y">${x[1]} واجب</span></div>`).join(''):'<p class="mut">كل الطلبة سلّموا اللي فات موعده.</p>')
+  +card('نسبة تسليم كل واجب','clip',hwRate.length?hwRate.map(x=>anBar(x.t,x.pct,x.d+'/'+x.el,anCol(x.pct))).join(''):empty)
+  +card('متوسط درجات التقييمات','chart',asmAvg.length?asmAvg.map(x=>anBar(x.t,x.pct,(Math.round(x.avg*10)/10)+'/'+x.max,anCol(x.pct))).join(''):empty)
+  +card('أضعف أسئلة الاختبارات','book',qStat.length?qStat.map(x=>anBar(x.q.slice(0,60),x.pct,Math.round(x.pct)+'% جاوبوا صح ('+x.n+')',anCol(x.pct))).join(''):empty);
+}
+/* ===================== مسار الدروس ===================== */
+let slData=[];
+async function sLessons(body){
+  const d=await api(sb.rpc('my_lessons')); slData=d||[];
+  const done=slData.filter(x=>x.done).length, pct=slData.length?Math.round(done*100/slData.length):0;
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('book',17)}</span><h3>مسار الدروس</h3></div>
+    ${slData.length?`<div class="anbar"><div class="anl"><span>تقدمك</span><b>${done}/${slData.length}</b></div><div class="ant"><div class="anf" style="width:${pct}%;background:#16a34a"></div></div></div>
+    <div class="hint">كل درس بيتفتح بعد ما تخلّص اللي قبله. لو الدرس عليه واجب لازم تسلّمه قبل ما تعلّم الدرس إنه خلص.</div>`:''}</div>
+  ${slData.length?slData.map((l,i)=>`<div class="card lsn ${l.locked?'lk':''}"><div class="row" style="gap:10px;align-items:center"><span class="lnum ${l.done?'dn':''}">${l.done?ic('check',16):(l.locked?ic('lock',16):(i+1))}</span>
+      <div class="grow"><b>${esc(l.title)}</b>${l.done?' <span class="badge g">خلص</span>':(l.locked?' <span class="badge y">مقفول</span>':'')}
+      ${l.description&&!l.locked?`<div class="hint" style="white-space:pre-wrap">${esc(l.description)}</div>`:''}</div></div>
+      ${l.locked?'<div class="hint mt">خلّص الدرس اللي قبله الأول.</div>':`<div class="row mt" style="flex-wrap:wrap;gap:8px">
+        ${ytId(l.video_url)?`<button class="btn sm" onclick="sLessonVideo(${l.id})">${ic('play',15)} الفيديو</button>`:''}
+        ${l.file_id?`<button class="btn sm sec" onclick="sLessonFile(${l.id})">${ic('file',15)} الملف</button>`:''}
+        ${l.hw_id?`<button class="btn sm sec" onclick="sLessonHw(${l.hw_id})">${ic('clip',15)} الواجب ${l.hw_done?'(اتسلّم)':'(لسه)'}</button>`:''}
+        ${l.done?'':`<button class="btn sm" onclick="sLessonDone(${l.id})">${ic('check',15)} خلّصت الدرس</button>`}</div>`}</div>`).join(''):'<div class="card"><div class="empty"><span class="eic">'+ic('book',24)+'</span>لسه مفيش دروس منشورة</div></div>'}`;
+}
+function sLessonVideo(id){const l=slData.find(x=>x.id===id); const y=ytId(l.video_url); if(!y) return toast('اللينك مش صحيح',true); openViewer('https://www.youtube-nocookie.com/embed/'+y+'?rel=0',l.title,l.video_url);}
+async function sLessonFile(id){const l=slData.find(x=>x.id===id); try{const f=await api(sb.from('files_meta').select('*').eq('id',l.file_id)); if(!f||!f[0]) return toast('الملف مش موجود',true); sfCache=[f[0]]; openFileViewer(f[0].id);}catch(e){toast(errMsg(e),true);}}
+function sLessonHw(hid){viewStudent('hw'); setTimeout(()=>{try{sHwOpen(hid);}catch(e){}},1800);}
+async function sLessonDone(id){
+  try{const r=await api(sb.rpc('complete_lesson',{p_lesson:id}));
+    if(!r.ok){const m={locked:'خلّص الدروس اللي قبله الأول',need_hw:'سلّم واجب الدرس الأول',no_student:'حسابك مش مفعّل',not_found:'الدرس مش موجود'};return toast(m[r.error]||'تعذر',true);}
+    toast('برافو! الدرس خلص'); viewStudent('lessons');
+  }catch(e){toast(errMsg(e),true);}
+}
+let tlData={};
+async function tLessons(body){
+  await loadGroups();
+  const [ls,files,hws,prog,sts]=await Promise.all([ api(sb.from('lessons').select('*').order('ord').order('id')), api(sb.from('files_meta').select('id,title')), api(sb.from('hw').select('id,title')), api(sb.from('lesson_progress').select('lesson_id,student_id')), api(sb.from('students').select('id,name,active')) ]);
+  tlData={ls:ls||[],prog:prog||[],sts:(sts||[]).filter(s=>s.active)};
+  const opt=(a,k)=>(a||[]).map(x=>`<option value="${x.id}">${esc(x.title)}</option>`).join('');
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('plus',17)}</span><h3>درس جديد</h3></div>
+    <div class="field"><label>عنوان الدرس</label><input id="ls-t" maxlength="200"></div>
+    <div class="field"><label>وصف (اختياري)</label><textarea id="ls-d" rows="2"></textarea></div>
+    <div class="field"><label>لينك فيديو يوتيوب (اختياري)</label><input id="ls-v" style="direction:ltr;text-align:left" placeholder="https://youtu.be/..."></div>
+    <div class="row mb"><div class="field grow"><label>ملف من الملفات (اختياري)</label><select id="ls-f"><option value="">بدون</option>${opt(files)}</select></div>
+      <div class="field grow"><label>واجب مرتبط (اختياري)</label><select id="ls-h"><option value="">بدون</option>${opt(hws)}</select></div></div>
+    <div class="field"><label>الشعبة</label><select id="ls-g"><option value="">كل الشعب</option>${S.groups.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('')}</select></div>
+    <button class="btn sm" onclick="tLessonAdd()">${ic('check',16)} إضافة الدرس في آخر المسار</button></div>
+  <div class="card"><div class="sec-title"><span class="tic">${ic('book',17)}</span><h3>مسار الدروس</h3></div>
+  ${tlData.ls.length?tlData.ls.map((l,i)=>{const dn=tlData.prog.filter(p=>p.lesson_id===l.id).length;const who=tlData.prog.filter(p=>p.lesson_id===l.id).map(p=>(tlData.sts.find(s=>s.id===p.student_id)||{}).name).filter(Boolean);
+    return `<div class="frow"><span class="lnum">${i+1}</span><div class="grow"><b>${esc(l.title)}</b>${l.group_name?' <span class="badge b">'+esc(l.group_name)+'</span>':''}
+      <div class="hint">${l.video_url?'فيديو · ':''}${l.file_id?'ملف · ':''}${l.hw_id?'واجب · ':''}خلّصوه: ${dn} من ${tlData.sts.length}</div>
+      ${who.length?`<div class="hint">${who.map(esc).join('، ')}</div>`:''}</div>
+      <div class="row" style="gap:6px"><button class="btn sm sec" ${i?'':'disabled'} onclick="tLessonMove(${i},-1)">↑</button><button class="btn sm sec" ${i<tlData.ls.length-1?'':'disabled'} onclick="tLessonMove(${i},1)">↓</button>
+      <button class="btn sm dan" onclick="tLessonDel(${l.id})">${ic('trash',14)}</button></div></div>`;}).join(''):'<div class="empty"><span class="eic">'+ic('book',24)+'</span>مفيش دروس لسه</div>'}</div>`;
+}
+async function tLessonAdd(){
+  const t=v('ls-t').trim(); if(!t) return toast('اكتب عنوان الدرس',true);
+  const vu=v('ls-v').trim(); if(vu&&!ytId(vu)) return toast('لينك اليوتيوب مش صحيح',true);
+  const mx=tlData.ls.reduce((m,x)=>Math.max(m,x.ord),0);
+  try{await api(sb.from('lessons').insert({title:t,description:v('ls-d').trim(),video_url:vu,file_id:v('ls-f')?Number(v('ls-f')):null,hw_id:v('ls-h')?Number(v('ls-h')):null,group_name:v('ls-g'),ord:mx+1}));toast('اتضاف الدرس');viewTeacher('lessons');}catch(e){toast(errMsg(e),true);}
+}
+async function tLessonMove(i,d){
+  const a=tlData.ls[i], b=tlData.ls[i+d]; if(!a||!b) return;
+  try{ await api(sb.from('lessons').update({ord:b.ord}).eq('id',a.id)); await api(sb.from('lessons').update({ord:a.ord===b.ord?a.ord+d:a.ord}).eq('id',b.id)); viewTeacher('lessons'); }catch(e){toast(errMsg(e),true);}
+}
+async function tLessonDel(id){ if(!confirm('تحذف الدرس؟ (تقدّم الطلبة فيه هيتمسح)')) return; try{await api(sb.from('lessons').delete().eq('id',id));viewTeacher('lessons');}catch(e){toast(errMsg(e),true);} }
+
+/* ===================== اسأل المدرس ===================== */
+async function sAsk(body){
+  const qs=await api(sb.rpc('my_questions'))||[];
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('chat',17)}</span><h3>اسأل المدرس</h3></div>
+    <div class="field"><label>سؤالك</label><textarea id="q-b" rows="3" maxlength="1000" placeholder="اكتب سؤالك هنا..."></textarea></div>
+    <button class="btn sm" id="q-send" onclick="sAskSend()">${ic('check',16)} ابعت السؤال</button>
+    <div class="hint mt">المدرس بيرد هنا. ممكن يختار ينشر الإجابة لزمايلك من غير اسمك.</div></div>
+  <div class="card"><div class="sec-title"><span class="tic">${ic('book',17)}</span><h3>الأسئلة والإجابات</h3></div>
+  ${qs.length?qs.map(q=>`<div class="qitem"><div class="hint">${q.mine?'سؤالك':'سؤال من زميل'} · ${esc(fmtDT(q.created_at))}</div><div style="white-space:pre-wrap"><b>${esc(q.body)}</b></div>
+    ${q.answer?`<div class="qans"><b>رد المدرس:</b><div style="white-space:pre-wrap">${esc(q.answer)}</div></div>`:'<span class="badge y">مستني الرد</span>'}</div>`).join(''):'<div class="empty"><span class="eic">'+ic('chat',24)+'</span>مفيش أسئلة لسه</div>'}</div>`;
+}
+async function sAskSend(){
+  const b=v('q-b').trim(); if(!b) return toast('اكتب السؤال الأول',true);
+  const btn=document.getElementById('q-send'); btn.disabled=true;
+  try{const r=await api(sb.rpc('ask_question',{p_body:b})); if(!r.ok){const m={limit:'وصلت للحد اليومي (10 أسئلة). جرّب بكرة',too_long:'السؤال طويل',empty:'اكتب السؤال',no_student:'حسابك مش مفعّل'};btn.disabled=false;return toast(m[r.error]||'تعذر',true);} toast('اتبعت السؤال'); viewStudent('ask');}catch(e){btn.disabled=false;toast(errMsg(e),true);}
+}
+let tqData=[];
+async function tQuestions(body){
+  const [qs,sts]=await Promise.all([api(sb.from('questions').select('*').order('created_at',{ascending:false})),api(sb.from('students').select('id,name'))]);
+  tqData=qs||[]; const nm=id=>((sts||[]).find(s=>s.id===id)||{}).name||'؟';
+  const un=tqData.filter(q=>!q.answer).length;
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('chat',17)}</span><h3>الأسئلة ${un?'<span class="badge y">'+un+' مستني رد</span>':''}</h3></div>
+  ${tqData.length?[...tqData].sort((a,b)=>(a.answer?1:0)-(b.answer?1:0)).map(q=>`<div class="qitem"><div class="hint">${esc(nm(q.student_id))}${q.group_name?' · '+esc(q.group_name):''} · ${esc(fmtDT(q.created_at))}</div>
+    <div style="white-space:pre-wrap"><b>${esc(q.body)}</b></div>
+    <textarea id="qa-${q.id}" rows="3" placeholder="اكتب ردك...">${esc(q.answer||'')}</textarea>
+    <div class="row mt" style="flex-wrap:wrap;gap:8px"><label class="row" style="gap:6px"><input type="checkbox" id="qp-${q.id}" style="width:auto" ${q.public?'checked':''}> انشر الإجابة للشعبة (من غير اسم)</label>
+      <button class="btn sm" onclick="tQAnswer(${q.id})">${ic('check',15)} ${q.answer?'تحديث الرد':'ابعت الرد'}</button><button class="btn sm dan" onclick="tQDel(${q.id})">${ic('trash',14)}</button></div></div>`).join(''):'<div class="empty"><span class="eic">'+ic('chat',24)+'</span>مفيش أسئلة لسه</div>'}</div>`;
+}
+async function tQAnswer(id){const a=v('qa-'+id).trim(); if(!a) return toast('اكتب الرد',true); try{await api(sb.from('questions').update({answer:a,answered_at:new Date().toISOString(),public:document.getElementById('qp-'+id).checked}).eq('id',id)); toast('اتبعت الرد'); viewTeacher('qa');}catch(e){toast(errMsg(e),true);}}
+async function tQDel(id){ if(!confirm('تحذف السؤال؟')) return; try{await api(sb.from('questions').delete().eq('id',id));viewTeacher('qa');}catch(e){toast(errMsg(e),true);} }
 /* ===================== الواجبات: المدرس ===================== */
 let hwTch={cur:null};
 async function tHw(body){
@@ -2272,7 +2432,7 @@ tSettings=async function(body){
 async function tSaveLb(){ try{ await api(sb.from('settings').upsert({key:'leaderboard',value:{on:document.getElementById('set-lb').checked}})); toast('اتحفظ'); }catch(e){toast(errMsg(e),true);} }
 
 /* ===================== تنبيه نسخة جديدة ===================== */
-const BUILD='f3';
+const BUILD='f4';
 let buildShown=false;
 async function checkBuild(){
   if(buildShown) return;
