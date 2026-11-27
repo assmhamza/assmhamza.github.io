@@ -140,6 +140,13 @@ input[type=range]{width:100%}
  .tabs.side .tab{flex-direction:column;justify-content:center;gap:3px;padding:9px 3px;font-size:11.5px;line-height:1.25;text-align:center;border-radius:12px}
 }
 .btn.ok{background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 4px 14px rgba(21,128,61,.25)}
+.badge{white-space:nowrap}
+.bdgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.bdg{border:1.5px solid var(--line);border-radius:14px;padding:12px;text-align:center;opacity:.5;filter:grayscale(1)}
+.bdg.on{opacity:1;filter:none;border-color:#fcd34d;background:#fffbeb}
+.bdg .bic{color:#b45309;margin-bottom:4px}
+.frow.me{background:#eef2ff;border-radius:12px}
+.newver{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:9999;background:#131c33;color:#fff;border-radius:14px;padding:10px 14px;display:flex;gap:12px;align-items:center;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.35)}
 .pendbox{text-align:center;padding:26px 18px}
 .pendbox .pic{width:76px;height:76px;margin:0 auto 12px;border-radius:50%;background:#fef3c7;color:#b45309;display:flex;align-items:center;justify-content:center}
 .pendbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:14px;padding:10px 12px;margin-bottom:12px;font-weight:700;color:#92400e}
@@ -414,6 +421,9 @@ play:'<circle cx="12" cy="12" r="8.5"/><path d="M10 8.3l6 3.7-6 3.7z" fill="curr
 phone:'<path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5l1.5-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 4.5 5a2 2 0 0 1 2-2z"/>',
 lock:'<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
 check:'<path d="m4.5 12.5 5 5L19.5 7"/>',
+play:'<path d="M7 4.5v15l12-7.5z"/>',
+stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
+clip:'<path d="M9 3h6l1 2h3v16H5V5h3z"/><path d="M9 12h6M9 16h4"/>',
 hourglass:'<path d="M6 3h12M6 21h12"/><path d="M7 3v3.5a5 5 0 0 0 2 4L12 12l-3 1.5a5 5 0 0 0-2 4V21"/><path d="M17 3v3.5a5 5 0 0 1-2 4L12 12l3 1.5a5 5 0 0 1 2 4V21"/>',
 pause:'<path d="M8 5v14M16 5v14"/>',
 book:'<path d="M2 4h5a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/><path d="M22 4h-5a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h6z"/><path d="M12 8v12"/>',
@@ -651,7 +661,7 @@ async function viewStudent(tab){
   if(S.profile && S.profile.active===false) return viewStudentPending();
   S.tab=tab;
   const p=S.profile;
-  const tabs=[['home','الرئيسية','home'],['att','حضوري','att'],['grades','درجاتي','chart'],['exams','الاختبارات','book'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['tools','أدوات ذكية','spark']];
+  const tabs=[['home','الرئيسية','home'],['att','حضوري','att'],['grades','درجاتي','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['py','محرر بايثون','code'],['rank','الترتيب والشارات','medal'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['tools','أدوات ذكية','spark']];
   root.innerHTML=`
   ${heroHTML('أهلًا '+p.name.split(' ')[0]+' · '+(p.group_name?'شعبة '+p.group_name:S.brand.grade), true)}
   <div class="wrap shellwrap mt"><div class="shell">
@@ -666,6 +676,9 @@ async function viewStudent(tab){
     else if(tab==='att') await studentAtt(body);
     else if(tab==='grades') await studentGrades(body);
     else if(tab==='exams') await sExams(body);
+    else if(tab==='hw') await sHw(body);
+    else if(tab==='py') await studentPy(body);
+    else if(tab==='rank') await sRank(body);
     else if(tab==='files') await studentFiles(body);
     else if(tab==='ann') await studentAnn(body);
     else if(tab==='tools') await studentTools(body);
@@ -958,7 +971,7 @@ async function sExams(body){
   ${(exams&&exams.length)?exams.map(e=>{const a=mine[e.id];const pc=a&&Number(a.total)>0?Math.round(a.score/a.total*100):null;
     return `<div class="frow"><div class="avatar">${ic('book',18)}</div><div class="grow"><b>${esc(e.title)}</b>
     <div class="hint">${esc(e.description||'')}${e.duration_minutes?' · '+e.duration_minutes+' '+arN(e.duration_minutes,'دقيقة','دقيقتين','دقائق','دقيقة'):''}</div></div>
-    ${a?`<span class="badge ${pc>=85?'g':pc>=50?'y':'r'}">${a.score} / ${a.total} · ${pc}%</span>`:`<button class="btn sm" onclick="sExamTake('${e.id}')">${ic('book',14)} ابدأ الاختبار</button>`}
+    ${a?`<span class="badge ${pc>=85?'g':pc>=50?'y':'r'}">${a.score}/${a.total} · ${pc}%</span>`:`<button class="btn sm" onclick="sExamTake('${e.id}')">${ic('book',14)} ابدأ الاختبار</button>`}
   </div>`}).join(''):'<div class="empty"><span class="eic">'+ic('book',24)+'</span>مفيش اختبارات متاحة دلوقتي</div>'}
   </div>`;
 }
@@ -1017,7 +1030,7 @@ async function examSubmit(auto){
     const body=document.getElementById('sbody');
     body.innerHTML=`<div class="card center" style="padding:36px">
       <div style="display:flex;justify-content:center">${donutSVG(pc, pc>=85?'#15803d':pc>=50?'#b45309':'#b91c1c')}</div>
-      <h2 style="margin:10px 0 4px">${r.score} / ${r.total}</h2>
+      <h2 style="margin:10px 0 4px">${r.score}/${r.total}</h2>
       <p class="mut">${auto?'انتهى الوقت واتسلّمت إجاباتك تلقائيًا. ':''}${msg}</p>
       <button class="btn mt" onclick="viewStudent('exams')">${ic('back',15)} رجوع للاختبارات</button>
     </div>`;
@@ -1048,7 +1061,7 @@ async function doTeacherLogin(){
 }
 
 /* ================= teacher shell ================= */
-const TTABS=[['home','الرئيسية','home'],['students','الطلاب','users'],['att','الحضور','att'],['grades','الدرجات','chart'],['exams','الاختبارات','book'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['settings','الإعدادات','gear']];
+const TTABS=[['home','الرئيسية','home'],['students','الطلاب','users'],['att','الحضور','att'],['grades','الدرجات','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['settings','الإعدادات','gear']];
 function viewTeacher(tab){
   S.tab=tab;
   root.innerHTML=`
@@ -1060,7 +1073,7 @@ function viewTeacher(tab){
     ${footHTML()}</div>
   </div></div>`;
   const body=document.getElementById('tbody');
-  const fn={home:tHome,students:tStudents,att:tAtt,grades:tGrades,exams:tExams,files:tFiles,ann:tAnn,settings:tSettings}[tab];
+  const fn={home:tHome,students:tStudents,att:tAtt,grades:tGrades,exams:tExams,hw:tHw,files:tFiles,ann:tAnn,settings:tSettings}[tab];
   Promise.resolve(fn(body)).catch(e=>{body.innerHTML='<div class="card center"><p>'+esc(errMsg(e))+'</p></div>';});
 }
 
@@ -1217,13 +1230,24 @@ async function tResetPin(id,name){
 }
 
 /* ---- teacher: printable student report ---- */
+function tReportWa(phone,name,ap,gp,pts){
+  let n=String(phone).replace(/\D/g,''); if(n.startsWith('00')) n=n.slice(2); else if(n.startsWith('0')) n='20'+n.slice(1);
+  const note=(document.getElementById('rp-note')||{}).value||'';
+  const t='تقرير الطالب '+name+' - '+brandLine()+'\n'+(ap!=null?'نسبة الحضور: '+ap+'%\n':'')+(gp!=null?'متوسط الدرجات: '+gp+'%\n':'')+(pts!=null?'النقاط: '+pts+'\n':'')+(note?'ملاحظة المدرس: '+note+'\n':'');
+  window.open('https://wa.me/'+n+'?text='+encodeURIComponent(t),'_blank');
+}
 async function tReport(id){
   try{
-    const [stu,att,asm,scores]=await Promise.all([
+    const [stu,att,asm,scores,hwl,hwsub,exl,exat,stt]=await Promise.all([
       api(sb.from('students').select('*').eq('id',id)),
       api(sb.from('attendance').select('*').eq('student_id',id).order('day',{ascending:false})),
       api(sb.from('assessments').select('*').order('day')),
       api(sb.from('scores').select('*').eq('student_id',id)),
+      api(sb.from('hw').select('*').order('due_at')),
+      api(sb.from('hw_submissions').select('*').eq('student_id',id)),
+      api(sb.from('exams').select('id,title,created_at').order('created_at')),
+      api(sb.from('exam_attempts').select('*').eq('student_id',id)),
+      sb.rpc('teacher_stats',{p_id:id}).then(r=>r.data).catch(()=>null),
     ]);
     const s=stu&&stu[0]; if(!s) throw new Error('الطالب غير موجود');
     const c={present:0,late:0,absent:0};(att||[]).forEach(a=>c[a.status]++);
@@ -1235,7 +1259,8 @@ async function tReport(id){
     root.innerHTML=`
     <div class="wrap no-print"><div class="row mt mb">
       <button class="btn sm sec" onclick="viewTeacher('students')">${ic('back',15)} رجوع</button>
-      <button class="btn sm" onclick="window.print()">${ic('print',15)} طباعة التقرير</button>
+      <button class="btn sm" onclick="window.print()">${ic('print',15)} طباعة / حفظ PDF</button>
+      ${s.phone?`<button class="btn sm sec" onclick="tReportWa('${esc(s.phone)}','${esc(s.name)}',${ap==null?'null':ap},${gp==null?'null':gp},${stt?stt.me.total:'null'})">${ic('mega',15)} إرسال ملخص واتساب</button>`:''}
     </div></div>
     <div class="printdoc">
       <div class="ph">
@@ -1252,7 +1277,16 @@ async function tReport(id){
       ${tm?`<table><tr><th>التقييم</th><th>التاريخ</th><th>الدرجة</th><th>%</th></tr>
       ${asm.map(a=>{const sc=scBy[a.id];const pc=sc!=null?L.pct(sc,a.max_score):null;
         return `<tr><td>${esc(a.title)}</td><td>${L.fmtDateAr(a.day)}</td><td>${sc!=null?sc+' / '+a.max_score:'—'}</td><td>${pc==null?'—':pc+'%'}</td></tr>`;}).join('')}
-      <tr><td colspan="2"><b>المجموع</b></td><td><b>${tp} / ${tm}</b></td><td><b>${gp}%</b></td></tr></table>`:'<p>لا توجد درجات مسجلة بعد.</p>'}
+      <tr><td colspan="2"><b>المجموع</b></td><td><b>${tp}/${tm}</b></td><td><b>${gp}%</b></td></tr></table>`:'<p>لا توجد درجات مسجلة بعد.</p>'}
+      ${(()=>{const hs={};(hwsub||[]).forEach(x=>hs[x.hw_id]=x);const hl=(hwl||[]).filter(h=>!h.group_name||h.group_name===s.group_name);
+        return hl.length?`<h2>الواجبات</h2><table><tr><th>الواجب</th><th>آخر موعد</th><th>الحالة</th><th>الدرجة</th></tr>${hl.map(h=>{const x=hs[h.id];
+        return `<tr><td>${esc(h.title)}</td><td>${esc(fmtDT(h.due_at))}</td><td>${x?(x.graded_at?'اتصحح':'تم التسليم'):'لم يسلّم'}</td><td>${x&&x.graded_at?x.score+' / '+h.max_score:'—'}</td></tr>`;}).join('')}</table>`:'';})()}
+      ${(()=>{const ea={};(exat||[]).forEach(x=>ea[x.exam_id]=x);const el=(exl||[]).filter(e=>ea[e.id]);
+        return el.length?`<h2>الاختبارات الإلكترونية</h2><table><tr><th>الاختبار</th><th>الدرجة</th><th>%</th></tr>${el.map(e=>{const a=ea[e.id];return `<tr><td>${esc(e.title)}</td><td>${a.score}/${a.total}</td><td>${Number(a.total)>0?Math.round(a.score/a.total*100)+'%':'—'}</td></tr>`;}).join('')}</table>`:'';})()}
+      ${stt?`<h2>النشاط والنقاط</h2><table><tr><th>إجمالي النقاط</th><th>الترتيب في الشعبة</th></tr><tr><td><b>${stt.me.total}</b></td><td>${stt.rank.rank} من ${stt.rank.size}</td></tr></table>`:''}
+      <h2>ملاحظة المدرس</h2>
+      <div class="no-print"><textarea id="rp-note" rows="3" style="width:100%" placeholder="اكتب ملاحظة لولي الأمر (اختياري)" oninput="document.getElementById('rp-note-p').textContent=this.value"></textarea></div>
+      <p id="rp-note-p" style="white-space:pre-wrap;min-height:20px"></p>
       <p style="margin-top:22px;font-size:12px;color:#666">صادر من منصة البرمجة · ${esc(S.brand.name)} · ${esc(brandLine())}</p>
     </div>`;
   }catch(e){toast(errMsg(e),true);}
@@ -1411,7 +1445,7 @@ async function tExamEdit(id){
   </div>
   <div class="card"><div class="sec-title"><span class="tic">${ic('medal',17)}</span><h3>النتائج (${(attempts||[]).length})</h3></div>
     ${sorted.length?`<table><tr><th>الطالب</th><th>الدرجة</th><th>%</th><th>التاريخ</th><th></th></tr>
-    ${sorted.map((a,i)=>{const pc=Number(a.total)>0?Math.round(a.score/a.total*100):0;return `<tr><td>${i===0?'🥇 ':''}${esc(nameOf2(a.student_id))}</td><td>${a.score} / ${a.total}</td><td><span class="badge ${pc>=85?'g':pc>=50?'y':'r'}">${pc}%</span></td><td>${L.fmtDateAr(a.created_at)}</td><td><button class="btn sm out" onclick="tCert('${a.student_id}')">${ic('medal',14)} شهادة</button></td></tr>`}).join('')}
+    ${sorted.map((a,i)=>{const pc=Number(a.total)>0?Math.round(a.score/a.total*100):0;return `<tr><td>${i===0?'🥇 ':''}${esc(nameOf2(a.student_id))}</td><td>${a.score}/${a.total}</td><td><span class="badge ${pc>=85?'g':pc>=50?'y':'r'}">${pc}%</span></td><td>${L.fmtDateAr(a.created_at)}</td><td><button class="btn sm out" onclick="tCert('${a.student_id}')">${ic('medal',14)} شهادة</button></td></tr>`}).join('')}
     </table>`:'<div class="empty">محدش دخل الاختبار لسه</div>'}
   </div>`;
 }
@@ -1623,7 +1657,7 @@ function renderRank(){
   <table><tr><th>#</th><th>الطالب</th><th>المجموع</th><th>%</th></tr>
     ${rows.map((r,i)=>`<tr>
       <td>${i<3?`<span style="color:${medalColor[i]}">${ic('medal',20)}</span>`:i+1}</td>
-      <td>${esc(r.name)}</td><td>${r.tp} / ${r.tm}</td>
+      <td>${esc(r.name)}</td><td>${r.tp}/${r.tm}</td>
       <td><span class="badge ${r.pct>=85?'g':r.pct>=50?'y':'r'}">${r.pct}%</span></td></tr>`).join('')}</table>`
   :'<div class="empty"><span class="eic">'+ic('chart',24)+'</span>لسه مفيش درجات</div>');
 }
@@ -1857,6 +1891,267 @@ async function tChangePw(){
     toast('اتغيرت كلمة السر');
   }catch(e){toast(errMsg(e),true);}
 }
+/* ===================== بايثون داخل المتصفح (Pyodide) ===================== */
+const PY_BASE='https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
+const PYRUN_SRC=[
+'import builtins,sys,traceback',
+'_l=__inp.split("\\n") if __inp else []',
+'def _input(p=""):',
+'    print(p,end="")',
+'    if _l:',
+'        v=_l.pop(0); print(v); return v',
+'    raise EOFError("مفيش مدخلات كفاية. اكتب القيم في خانة المدخلات، كل قيمة في سطر")',
+'builtins.input=_input',
+'try:',
+'    exec(compile(__code,"main.py","exec"),{"__name__":"__main__"})',
+'except SystemExit:',
+'    pass',
+'except BaseException as e:',
+'    t=e.__traceback__',
+'    t=t.tb_next if t is not None else None',
+'    sys.stderr.write("".join(traceback.format_exception(type(e),e,t)))'
+].join('\n');
+function pyWorkerMain(){
+  let py=null;
+  loadPyodide({indexURL:PYBASE}).then(p=>{py=p;postMessage({t:'ready'});}).catch(e=>postMessage({t:'fatal',s:String(e)}));
+  onmessage=async ev=>{
+    const m=ev.data; if(m.t!=='run'||!py) return;
+    try{
+      py.setStdout({batched:s=>postMessage({t:'out',s:s+'\n'})});
+      py.setStderr({batched:s=>postMessage({t:'out',s:s+'\n'})});
+      py.globals.set('__code',m.code); py.globals.set('__inp',m.inp);
+      await py.runPythonAsync(PYRUN);
+      postMessage({t:'done'});
+    }catch(err){ postMessage({t:'out',s:String(err&&err.message||err)+'\n'}); postMessage({t:'done'}); }
+  };
+}
+const PY_WORKER_SRC='const PYBASE='+JSON.stringify(PY_BASE)+';const PYRUN='+JSON.stringify(PYRUN_SRC)+';importScripts(PYBASE+"pyodide.js");('+pyWorkerMain.toString()+')();';
+let pyW=null,pyState='idle',pyJob=null,pyTimer=null;
+function pyEl(id){return document.getElementById(id);}
+function pyStatus(t,cls){const s=pyJob&&pyEl(pyJob.status); if(s){s.textContent=t;s.className='badge '+(cls||'b');}}
+function pyStart(){
+  if(pyW) return;
+  pyState='loading';
+  pyW=new Worker(URL.createObjectURL(new Blob([PY_WORKER_SRC],{type:'text/javascript'})));
+  pyW.onmessage=ev=>{
+    const m=ev.data;
+    if(m.t==='ready'){ pyState='ready'; if(pyJob&&pyJob.pending){ const o=pyEl(pyJob.out); if(o) o.textContent=''; pySend(); } }
+    else if(m.t==='fatal'){ pyFail('تعذر تحميل بايثون. تأكد إن النت شغال وجرّب تاني.'); }
+    else if(m.t==='out'){ const o=pyJob&&pyEl(pyJob.out); if(o){o.textContent+=m.s;o.scrollTop=o.scrollHeight;} }
+    else if(m.t==='done'){ pyFinish('خلص','g'); }
+  };
+  pyW.onerror=()=>pyFail('حصل خطأ في تشغيل بايثون');
+}
+function pySend(){
+  pyJob.pending=false; pyStatus('بيشتغل...','y');
+  pyW.postMessage({t:'run',code:pyJob.code,inp:pyJob.inp});
+  clearTimeout(pyTimer); pyTimer=setTimeout(()=>{ pyStop('اتوقف: الكود خد أكتر من 15 ثانية (يمكن فيه loop مش بتخلص)'); },15000);
+}
+function pyFinish(t,c){ clearTimeout(pyTimer); const b=pyJob&&pyEl(pyJob.run); if(b) b.disabled=false; pyStatus(t,c); if(pyJob) pyJob.done=true; }
+function pyFail(t){ clearTimeout(pyTimer); try{pyW&&pyW.terminate();}catch(e){} pyW=null; pyState='idle'; const o=pyJob&&pyEl(pyJob.out); if(o) o.textContent+=t+'\n'; pyFinish('فشل','r'); }
+function pyStop(msg){ clearTimeout(pyTimer); try{pyW&&pyW.terminate();}catch(e){} pyW=null; pyState='idle'; const o=pyJob&&pyEl(pyJob.out); if(o) o.textContent+=(msg||'اتوقف')+'\n'; pyFinish('اتوقف','r'); }
+function pyRun(ids){ // ids: {code,inp,out,status,run}
+  const code=pyEl(ids.code).value; if(!code.trim()) return toast('اكتب كود الأول',true);
+  const o=pyEl(ids.out); o.style.display='block'; o.textContent='';
+  pyEl(ids.run).disabled=true;
+  pyJob={out:ids.out,status:ids.status,run:ids.run,code,inp:ids.inp?pyEl(ids.inp).value:'',pending:true,done:false};
+  try{ localStorage.setItem('py_runs',String((+localStorage.getItem('py_runs')||0)+1)); }catch(e){}
+  if(pyState==='idle'){ pyStart(); pyStatus('بيحمّل...','y'); o.textContent='بيحمّل بايثون لأول مرة (حوالي 10 ميجا)، استنى شوية...\n'; }
+  else if(pyState==='ready') pySend();
+  else pyStatus('بيحمّل...','y');
+}
+function pyTabKey(ev){ if(ev.key==='Tab'){ ev.preventDefault(); const t=ev.target,s=t.selectionStart; t.value=t.value.slice(0,s)+'    '+t.value.slice(t.selectionEnd); t.selectionStart=t.selectionEnd=s+4; } }
+const PY_EX={
+  hello:'print("أهلاً بيك في بايثون")\nname = "عاصم"\nprint("مرحباً", name)',
+  loop:'total = 0\nfor i in range(1, 11):\n    total += i\n    print(i, total)\nprint("المجموع =", total)',
+  func:'def is_even(n):\n    return n % 2 == 0\n\nfor x in range(1, 7):\n    print(x, "زوجي" if is_even(x) else "فردي")',
+  inp:'name = input("اسمك؟ ")\nage = int(input("سنك؟ "))\nprint(name, "بعد 5 سنين هيبقى عمره", age + 5)'
+};
+async function studentPy(body){
+  let saved=''; try{saved=localStorage.getItem('py_code')||'';}catch(e){}
+  body.innerHTML=`
+  <div class="card">
+    <div class="sec-title"><span class="tic">${ic('code',17)}</span><h3>محرر بايثون</h3></div>
+    <p class="mut">اكتب كود بايثون وشغّله هنا مباشرة. بيشتغل على جهازك من غير تثبيت حاجة. أول مرة بيحمّل ملفات بايثون (حوالي 10 ميجا) وبعدها بيبقى أسرع.</p>
+    <div class="row mb"><select id="py-ex" class="grow" style="border:1.5px solid var(--line);border-radius:12px;padding:10px" onchange="pyLoadEx()">
+      <option value="">أمثلة جاهزة...</option><option value="hello">طباعة وترحيب</option><option value="loop">حلقة تكرار</option><option value="func">دالة</option><option value="inp">إدخال من المستخدم</option></select></div>
+    <div class="field"><textarea id="py-code" rows="12" spellcheck="false" onkeydown="pyTabKey(event)" oninput="try{localStorage.setItem('py_code',this.value)}catch(e){}" style="direction:ltr;text-align:left;font-family:Consolas,monospace;font-size:14px;line-height:1.5" placeholder="# اكتب الكود هنا">${esc(saved||PY_EX.hello)}</textarea>
+    <div class="hint">الكود بيتحفظ على جهازك بس. الزر Tab بيدخّل أربع مسافات.</div></div>
+    <div class="field"><label>مدخلات للأمر input (اختياري، كل قيمة في سطر)</label><textarea id="py-in" rows="2" style="direction:ltr;text-align:left;font-family:Consolas,monospace"></textarea></div>
+    <div class="row" style="flex-wrap:wrap"><button class="btn sm" id="py-run" onclick="pyRun({code:'py-code',inp:'py-in',out:'py-out',status:'py-st',run:'py-run'})">${ic('play',16)} شغّل</button>
+      <button class="btn sm sec" onclick="pyStop('اتوقف')">${ic('stop',16)} إيقاف</button>
+      <button class="btn sm sec" onclick="pyEl('py-out').textContent=''">مسح الناتج</button>
+      <span class="badge b" id="py-st">جاهز</span></div>
+    <pre class="toolout" id="py-out" style="display:none;max-height:320px"></pre>
+  </div>`;
+}
+function pyLoadEx(){ const k=pyEl('py-ex').value; if(k){ pyEl('py-code').value=PY_EX[k]; try{localStorage.setItem('py_code',PY_EX[k]);}catch(e){} } }
+
+/* ===================== الواجبات: الطالب ===================== */
+function fmtDT(d){ try{ return new Date(d).toLocaleString('ar-EG-u-nu-latn',{dateStyle:'medium',timeStyle:'short'}); }catch(e){ return String(d); } }
+let hwStu={hws:[],subs:{}};
+async function sHw(body){
+  const [hws,subs]=await Promise.all([ api(sb.from('hw').select('*').order('due_at',{ascending:true})), api(sb.from('hw_submissions').select('*')) ]);
+  hwStu.hws=hws||[]; hwStu.subs={}; (subs||[]).forEach(s=>hwStu.subs[s.hw_id]=s);
+  const now=Date.now();
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('clip',17)}</span><h3>الواجبات</h3></div>
+  ${hwStu.hws.length?hwStu.hws.map(h=>{
+    const s=hwStu.subs[h.id], late=new Date(h.due_at).getTime()<now;
+    const st=s&&s.graded_at!=null?`<span class="badge g">اتصحح: ${s.score}/${h.max_score}</span>`:s?'<span class="badge b">تم التسليم</span>':late?'<span class="badge r">انتهى الموعد</span>':'<span class="badge y">لسه مسلمتش</span>';
+    return `<div class="frow"><div class="avatar">${ic('clip',18)}</div><div class="grow"><b>${esc(h.title)}</b>
+      <div class="hint">آخر موعد: ${esc(fmtDT(h.due_at))} · الدرجة ${h.max_score}${h.group_name?' · شعبة '+esc(h.group_name):''}</div></div>
+      ${st}<button class="btn sm ${s||late?'out':''}" onclick="sHwOpen(${h.id})">${s||late?'عرض':'سلّم'}</button></div>`;}).join('')
+  :'<div class="empty"><span class="eic">'+ic('clip',24)+'</span>مفيش واجبات دلوقتي</div>'}
+  </div><div id="hw-detail"></div>`;
+}
+function sHwOpen(id){
+  const h=hwStu.hws.find(x=>x.id===id); if(!h) return;
+  const s=hwStu.subs[id], closed=new Date(h.due_at).getTime()<Date.now(), graded=s&&s.graded_at!=null;
+  const canEdit=!closed&&!graded;
+  const el=document.getElementById('hw-detail');
+  el.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('clip',17)}</span><h3>${esc(h.title)}</h3></div>
+    <p style="white-space:pre-wrap">${esc(h.description||'')}</p>
+    <div class="hint mb">آخر موعد: ${esc(fmtDT(h.due_at))}${closed?' (انتهى)':''}</div>
+    ${graded?`<div class="pendbar" style="background:#f0fdf4;border-color:#86efac;color:#166534">درجتك: ${s.score}/${h.max_score}${s.feedback?' · تعليق المدرس: '+esc(s.feedback):''}</div>`:''}
+    <div class="field"><label>${h.kind==='python'?'كود بايثون':'إجابتك'}</label>
+      <textarea id="hw-ans" rows="${h.kind==='python'?12:7}" ${canEdit?'':'readonly'} ${h.kind==='python'?'spellcheck="false" onkeydown="pyTabKey(event)" style="direction:ltr;text-align:left;font-family:Consolas,monospace"':''} placeholder="${canEdit?'اكتب هنا...':''}">${esc(s?s.content:'')}</textarea>
+      ${canEdit?'':'<div class="hint">'+(graded?'الواجب اتصحح ومينفعش يتعدل.':'الموعد انتهى.')+'</div>'}</div>
+    ${h.kind==='python'?`<div class="field"><label>مدخلات للأمر input (اختياري)</label><textarea id="hw-in" rows="2" style="direction:ltr;text-align:left;font-family:Consolas,monospace"></textarea></div>
+      <div class="row mb"><button class="btn sm sec" id="hw-run" onclick="pyRun({code:'hw-ans',inp:'hw-in',out:'hw-out',status:'hw-st',run:'hw-run'})">${ic('play',15)} جرّب الكود</button><span class="badge b" id="hw-st">جاهز</span></div>
+      <pre class="toolout" id="hw-out" style="display:none"></pre>`:''}
+    ${canEdit?`<button class="btn" id="hw-send" onclick="sHwSubmit(${id})">${ic('check',16)} ${s?'تحديث التسليم':'تسليم الواجب'}</button>`:''}
+  </div>`;
+  el.scrollIntoView({behavior:'smooth'});
+}
+async function sHwSubmit(id){
+  const c=v('hw-ans'); if(!c.trim()) return toast('اكتب إجابتك الأول',true);
+  const b=document.getElementById('hw-send'); b.disabled=true;
+  try{
+    const r=await api(sb.rpc('submit_hw',{p_hw:id,p_content:c}));
+    if(!r.ok){ const m={closed:'الموعد انتهى',graded:'الواجب اتصحح ومينفعش يتعدل',empty:'اكتب إجابتك الأول',too_long:'الإجابة طويلة جداً',not_found:'الواجب مش موجود',no_student:'حسابك مش مفعّل'}; throw new Error(m[r.error]||'تعذر التسليم'); }
+    toast('اتسلّم الواجب'); studentHwReload();
+  }catch(e){ toast(errMsg(e),true); b.disabled=false; }
+}
+function studentHwReload(){ viewStudent('hw'); }
+
+/* ===================== الترتيب والشارات ===================== */
+const BADGES=[
+ ['أول خطوة','سجّل أي نشاط على المنصة',s=>s.me.total>0],
+ ['مواظب','حضور 5 حصص',s=>s.me.att_present>=5],
+ ['متفوق','درجة 90% أو أكتر في تقييم',s=>s.me.asm_top>=1],
+ ['نجم الاختبارات','درجة 90% أو أكتر في اختبار إلكتروني',s=>s.me.exam_top>=1],
+ ['منجز الواجبات','تسليم 3 واجبات',s=>s.me.hw_n>=3],
+ ['مبرمج بايثون','شغّل 5 أكواد في محرر بايثون',s=>(+localStorage.getItem('py_runs')||0)>=5],
+ ['مية نقطة','اجمع 100 نقطة',s=>s.me.total>=100],
+ ['في الصدارة','المركز الأول في شعبتك',s=>s.rank&&s.rank.rank===1&&s.rank.size>1]
+];
+async function sRank(body){
+  const s=await api(sb.rpc('my_stats')); if(!s) throw new Error('حسابك مش مفعّل');
+  const earned=BADGES.filter(b=>{try{return b[2](s);}catch(e){return false;}}).length;
+  body.innerHTML=`
+  <div class="card center"><div class="sec-title" style="justify-content:center"><span class="tic">${ic('medal',17)}</span><h3>نقاطك</h3></div>
+    <div style="font-size:44px;font-weight:900;color:var(--pri)">${s.me.total}</div>
+    <div class="mut">${s.rank?'ترتيبك '+s.rank.rank+' من '+s.rank.size+' في شعبتك':''}</div>
+    <div class="hint mt">الحضور 3 نقاط، التأخير نقطة، وكل تقييم أو اختبار أو واجب بيدّي لحد 20 نقطة على حسب درجتك. تسليم الواجب قبل ما يتصحح بنقطتين.</div></div>
+  <div class="card"><div class="sec-title"><span class="tic">${ic('medal',17)}</span><h3>شاراتك (${earned} من ${BADGES.length})</h3></div>
+    <div class="bdgrid">${BADGES.map(b=>{let ok=false;try{ok=b[2](s);}catch(e){}
+      return `<div class="bdg ${ok?'on':''}"><div class="bic">${ic('medal',26)}</div><b>${b[0]}</b><div class="hint">${b[1]}</div></div>`;}).join('')}</div></div>
+  ${s.board_on&&s.board?`<div class="card"><div class="sec-title"><span class="tic">${ic('chart',17)}</span><h3>لوحة الشرف (أول ${s.board.length})</h3></div>
+    ${s.board.map((r,i)=>`<div class="frow ${r.me?'me':''}"><div class="avatar">${i+1}</div><div class="grow"><b>${esc(r.n)}</b>${r.me?' <span class="badge b">إنت</span>':''}</div><span class="badge ${i===0?'y':'g'}">${r.pts} نقطة</span></div>`).join('')}
+    <div class="hint mt">بتظهر الأسماء الأولى بس.</div></div>`:''}`;
+}
+
+/* ===================== الواجبات: المدرس ===================== */
+let hwTch={cur:null};
+async function tHw(body){
+  await loadGroups();
+  const [hws,subs]=await Promise.all([ api(sb.from('hw').select('*').order('created_at',{ascending:false})), api(sb.from('hw_submissions').select('id,hw_id,score,graded_at')) ]);
+  const cnt={},gr={}; (subs||[]).forEach(s=>{cnt[s.hw_id]=(cnt[s.hw_id]||0)+1; if(s.graded_at) gr[s.hw_id]=(gr[s.hw_id]||0)+1;});
+  body.innerHTML=`
+  <div class="card"><div class="sec-title"><span class="tic">${ic('plus',17)}</span><h3>واجب جديد</h3></div>
+    <div class="field"><label>عنوان الواجب</label><input id="hw-t" maxlength="200"></div>
+    <div class="field"><label>الوصف / المطلوب</label><textarea id="hw-d" rows="3"></textarea></div>
+    <div class="row mb"><div class="field grow"><label>الشعبة</label><select id="hw-g"><option value="">كل الشعب</option>${S.groups.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('')}</select></div>
+      <div class="field grow"><label>نوع التسليم</label><select id="hw-k"><option value="text">نص</option><option value="python">كود بايثون (مع زر تجربة)</option></select></div></div>
+    <div class="row mb"><div class="field grow"><label>آخر موعد</label><input type="datetime-local" id="hw-due"></div>
+      <div class="field grow"><label>الدرجة الكاملة</label><input type="number" id="hw-max" value="10" min="1"></div></div>
+    <button class="btn sm" onclick="tHwCreate()">${ic('check',16)} نشر الواجب</button></div>
+  <div class="card"><div class="sec-title"><span class="tic">${ic('clip',17)}</span><h3>الواجبات</h3></div>
+  ${(hws&&hws.length)?hws.map(h=>`<div class="frow"><div class="avatar">${ic('clip',18)}</div><div class="grow"><b>${esc(h.title)}</b>
+    <div class="hint">آخر موعد: ${esc(fmtDT(h.due_at))}${h.group_name?' · '+esc(h.group_name):' · كل الشعب'} · تسليمات: ${cnt[h.id]||0} · متصحح: ${gr[h.id]||0}</div></div>
+    <button class="btn sm" onclick="tHwOpen(${h.id})">التسليمات</button>
+    <button class="btn sm dan" onclick="tHwDel(${h.id})">${ic('trash',14)}</button></div>`).join(''):'<div class="empty"><span class="eic">'+ic('clip',24)+'</span>مفيش واجبات لسه</div>'}
+  </div>`;
+  const d=new Date(Date.now()+7*864e5); d.setHours(23,59,0,0);
+  const pad=n=>String(n).padStart(2,'0'); document.getElementById('hw-due').value=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+async function tHwCreate(){
+  const t=v('hw-t').trim(), due=v('hw-due'), max=Number(v('hw-max'));
+  if(!t) return toast('اكتب عنوان الواجب',true);
+  if(!due) return toast('حدد آخر موعد',true);
+  if(!(max>0)) return toast('الدرجة لازم تكون أكبر من صفر',true);
+  try{ await api(sb.from('hw').insert({title:t,description:v('hw-d').trim(),group_name:v('hw-g'),kind:v('hw-k'),due_at:new Date(due).toISOString(),max_score:max}));
+    toast('اتنشر الواجب'); viewTeacher('hw'); }catch(e){ toast(errMsg(e),true); }
+}
+async function tHwDel(id){ if(!confirm('حذف الواجب وكل تسليماته؟')) return; try{ await api(sb.from('hw').delete().eq('id',id)); toast('اتحذف'); viewTeacher('hw'); }catch(e){toast(errMsg(e),true);} }
+async function tHwOpen(id){
+  const body=document.getElementById('tbody');
+  const hr=await api(sb.from('hw').select('*').eq('id',id)); const h=hr&&hr[0]; if(!h) return;
+  const [stu,subs]=await Promise.all([ api(sb.from('students').select('id,name,group_name,active').order('name')), api(sb.from('hw_submissions').select('*').eq('hw_id',id)) ]);
+  const by={}; (subs||[]).forEach(s=>by[s.student_id]=s);
+  const list=(stu||[]).filter(s=>s.active!==false&&(!h.group_name||s.group_name===h.group_name));
+  const d=new Date(h.due_at); const pad=n=>String(n).padStart(2,'0'); const dv=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+  body.innerHTML=`<div class="card"><div class="row mb"><button class="btn sm sec" onclick="viewTeacher('hw')">${ic('back',15)} رجوع</button></div>
+    <div class="sec-title"><span class="tic">${ic('clip',17)}</span><h3>${esc(h.title)}</h3></div>
+    <p style="white-space:pre-wrap">${esc(h.description||'')}</p>
+    <div class="row mb"><div class="field grow"><label>آخر موعد (تقدر تمدده)</label><input type="datetime-local" id="hw-due2" value="${dv}"></div>
+      <button class="btn sm" onclick="tHwDue(${id})">${ic('check',15)} حفظ الموعد</button></div></div>
+    <div class="card">${list.length?list.map(s=>{const x=by[s.id];
+      return `<div class="frow" style="flex-wrap:wrap"><div class="avatar">${esc((s.name||'?')[0])}</div><div class="grow"><b>${esc(s.name)}</b></div>
+      ${x?(x.graded_at?`<span class="badge g">${x.score}/${h.max_score}</span>`:'<span class="badge b">مستني التصحيح</span>'):'<span class="badge r">لم يسلّم</span>'}
+      ${x?`<pre class="toolout" style="width:100%;max-height:200px;display:block;white-space:pre-wrap;direction:ltr;text-align:left">${esc(x.content)}</pre>
+        <div class="row" style="width:100%"><div class="field" style="margin:0;max-width:140px"><input type="number" id="hs-${x.id}" min="0" max="${h.max_score}" step="0.5" placeholder="الدرجة من ${h.max_score}" value="${x.score==null?'':x.score}"></div>
+        <div class="field grow" style="margin:0"><input id="hf-${x.id}" placeholder="تعليق (اختياري)" value="${esc(x.feedback||'')}"></div><button class="btn sm" onclick="tHwGrade(${x.id},${h.max_score},${id})">${ic('check',15)} حفظ</button></div>`:''}
+      </div>`;}).join(''):'<div class="empty">مفيش طلاب مفعّلين في الشعبة دي</div>'}</div>`;
+}
+async function tHwGrade(subId,max,hwId){
+  const sc=Number(document.getElementById('hs-'+subId).value);
+  if(document.getElementById('hs-'+subId).value===''||!(sc>=0)||sc>max) return toast('الدرجة لازم تكون من 0 لـ '+max,true);
+  try{ await api(sb.from('hw_submissions').update({score:sc,feedback:document.getElementById('hf-'+subId).value.trim(),graded_at:new Date().toISOString()}).eq('id',subId)); toast('اتحفظت الدرجة'); tHwOpen(hwId); }catch(e){toast(errMsg(e),true);}
+}
+async function tHwDue(id){ const d=v('hw-due2'); if(!d) return toast('حدد الموعد',true); try{ await api(sb.from('hw').update({due_at:new Date(d).toISOString()}).eq('id',id)); toast('اتحفظ الموعد'); }catch(e){toast(errMsg(e),true);} }
+
+/* ===================== إعداد لوحة الشرف (المدرس) ===================== */
+const _tSettingsBase=tSettings;
+tSettings=async function(body){
+  await _tSettingsBase(body);
+  let on=true; try{ const r=await api(sb.from('settings').select('value').eq('key','leaderboard')); if(r&&r[0]&&r[0].value) on=r[0].value.on!==false; }catch(e){}
+  body.insertAdjacentHTML('beforeend',`<div class="card"><div class="sec-title"><span class="tic">${ic('medal',17)}</span><h3>لوحة الشرف</h3></div>
+    <p class="mut">لوحة الشرف بتظهر للطلاب أول 10 في شعبتهم بالاسم الأول بس. تقدر توقفها وتفضل النقاط والشارات ظاهرة لكل طالب لنفسه.</p>
+    <label class="row" style="gap:8px"><input type="checkbox" id="set-lb" ${on?'checked':''} style="width:auto"> إظهار لوحة الشرف للطلاب</label>
+    <button class="btn sm mt" onclick="tSaveLb()">${ic('check',16)} حفظ</button></div>`);
+};
+async function tSaveLb(){ try{ await api(sb.from('settings').upsert({key:'leaderboard',value:{on:document.getElementById('set-lb').checked}})); toast('اتحفظ'); }catch(e){toast(errMsg(e),true);} }
+
+/* ===================== تنبيه نسخة جديدة ===================== */
+const BUILD='f1';
+let buildShown=false;
+async function checkBuild(){
+  if(buildShown) return;
+  try{
+    const r=await sb.from('settings').select('value').eq('key','build');
+    const id=r.data&&r.data[0]&&r.data[0].value&&r.data[0].value.id;
+    if(id&&id!==BUILD){
+      buildShown=true;
+      const d=document.createElement('div'); d.className='newver no-print';
+      d.innerHTML='<span>فيه نسخة جديدة من المنصة</span><button class="btn sm" onclick="location.href=location.pathname+\'?v=\'+Date.now()">تحديث الآن</button>';
+      document.body.appendChild(d);
+    }
+  }catch(e){}
+}
+setTimeout(checkBuild,4000); setInterval(checkBuild,300000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) checkBuild(); });
+
 function download(name,content,mime){
   const blob=new Blob([content],{type:mime||'application/octet-stream'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
