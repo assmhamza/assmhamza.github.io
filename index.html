@@ -1061,7 +1061,7 @@ async function doTeacherLogin(){
 }
 
 /* ================= teacher shell ================= */
-const TTABS=[['home','الرئيسية','home'],['students','الطلاب','users'],['att','الحضور','att'],['grades','الدرجات','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['settings','الإعدادات','gear']];
+const TTABS=[['home','الرئيسية','home'],['students','الطلاب','users'],['att','الحضور','att'],['grades','الدرجات','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['rank','الترتيب والشارات','medal'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['settings','الإعدادات','gear']];
 function viewTeacher(tab){
   S.tab=tab;
   root.innerHTML=`
@@ -1073,7 +1073,7 @@ function viewTeacher(tab){
     ${footHTML()}</div>
   </div></div>`;
   const body=document.getElementById('tbody');
-  const fn={home:tHome,students:tStudents,att:tAtt,grades:tGrades,exams:tExams,hw:tHw,files:tFiles,ann:tAnn,settings:tSettings}[tab];
+  const fn={home:tHome,students:tStudents,att:tAtt,grades:tGrades,exams:tExams,hw:tHw,rank:tRank,files:tFiles,ann:tAnn,settings:tSettings}[tab];
   Promise.resolve(fn(body)).catch(e=>{body.innerHTML='<div class="card center"><p>'+esc(errMsg(e))+'</p></div>';});
 }
 
@@ -2121,6 +2121,31 @@ async function tHwGrade(subId,max,hwId){
 }
 async function tHwDue(id){ const d=v('hw-due2'); if(!d) return toast('حدد الموعد',true); try{ await api(sb.from('hw').update({due_at:new Date(d).toISOString()}).eq('id',id)); toast('اتحفظ الموعد'); }catch(e){toast(errMsg(e),true);} }
 
+/* ===================== المدرس: الترتيب والشارات ===================== */
+let trData=[],trGroup='';
+async function tRank(body){
+  await loadGroups();
+  const d=await api(sb.rpc('teacher_board'));
+  trData=d||[];
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('medal',17)}</span><h3>الترتيب والشارات</h3></div>
+    <p class="mut">النقاط: الحضور 3، التأخير 1، وكل تقييم أو اختبار أو واجب لحد 20 نقطة على حسب الدرجة، وتسليم واجب لسه متصححش بنقطتين. الطلاب المفعّلين بس هما اللي بيدخلوا في الترتيب. شارة "مبرمج بايثون" بتتحسب على جهاز الطالب فمش بتظهر هنا.</p>
+    <div class="chips mt" id="tr-chips"></div></div>
+    <div class="card"><div id="tr-list"></div></div>`;
+  trRender();
+}
+function trRender(){
+  const gs=[...new Set(trData.map(x=>x.group_name).filter(Boolean))];
+  document.getElementById('tr-chips').innerHTML=`<button class="chip ${trGroup===''?'on':''}" onclick="trGroup='';trRender()">الكل</button>`+gs.map(g=>`<button class="chip ${trGroup===g&&g!==''?'on':''}" onclick="trGroup='${esc(g)}';trRender()">${esc(g||'بدون شعبة')}</button>`).join('');
+  const list=trData.filter(x=>trGroup===''||x.group_name===trGroup);
+  document.getElementById('tr-list').innerHTML=list.length?list.map(x=>{
+    const st={me:x.me,rank:x.rank?{rank:x.rank,size:x.size}:null};
+    const bs=BADGES.filter(b=>b[0]!=='مبرمج بايثون'&&(()=>{try{return b[2](st);}catch(e){return false;}})());
+    return `<div class="frow" style="flex-wrap:wrap"><div class="avatar">${x.rank||'—'}</div>
+      <div class="grow"><b>${esc(x.name)}</b><div class="hint">${esc(x.group_name||'بدون شعبة')}${x.active===false?' · في انتظار التفعيل':''} · حضور ${x.me.att_present} · واجبات ${x.me.hw_n}</div>
+      <div class="row" style="flex-wrap:wrap;gap:6px;margin-top:6px">${bs.length?bs.map(b=>`<span class="badge y">${ic('medal',12)} ${b[0]}</span>`).join(''):'<span class="hint">لسه من غير شارات</span>'}</div></div>
+      <span class="badge ${x.rank===1?'y':'g'}">${x.me.total} نقطة</span>
+      <button class="btn sm out" onclick="tReport('${x.id}')">${ic('print',14)} تقرير</button></div>`;}).join(''):'<div class="empty">مفيش طلاب</div>';
+}
 /* ===================== إعداد لوحة الشرف (المدرس) ===================== */
 const _tSettingsBase=tSettings;
 tSettings=async function(body){
@@ -2134,7 +2159,7 @@ tSettings=async function(body){
 async function tSaveLb(){ try{ await api(sb.from('settings').upsert({key:'leaderboard',value:{on:document.getElementById('set-lb').checked}})); toast('اتحفظ'); }catch(e){toast(errMsg(e),true);} }
 
 /* ===================== تنبيه نسخة جديدة ===================== */
-const BUILD='f1';
+const BUILD='f2';
 let buildShown=false;
 async function checkBuild(){
   if(buildShown) return;
