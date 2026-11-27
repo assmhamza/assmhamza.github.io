@@ -123,6 +123,22 @@ input[type=range]{width:100%}
 .hint{font-size:13px;color:var(--mut);margin-top:5px}
 .row{display:flex;gap:8px;align-items:center}
 .grow{flex:1}
+/* ---------- right-side navigation rail ---------- */
+.wrap.shellwrap{max-width:920px}
+.shell{display:flex;gap:14px;align-items:flex-start}
+.tabs.side{flex-direction:column;overflow:visible;padding:4px 0 12px;width:154px;flex:none;position:sticky;top:12px;gap:8px}
+.tabs.side .tab{border-radius:14px;padding:11px 13px;font-size:15px;justify-content:flex-start;width:100%;white-space:normal}
+.shbody{flex:1;min-width:0}
+.shbody input,.shbody select,.shbody textarea{min-width:0;max-width:100%}
+@media(max-width:600px){
+ .shell{gap:8px}
+ .shbody .row{flex-wrap:wrap}
+ .shbody .frow{flex-wrap:wrap}
+ .shbody .frow .grow{flex:1 1 140px;min-width:0}
+ .shbody .row .grow{flex:1 1 120px}
+ .tabs.side{width:76px;gap:6px}
+ .tabs.side .tab{flex-direction:column;justify-content:center;gap:3px;padding:9px 3px;font-size:11.5px;line-height:1.25;text-align:center;border-radius:12px}
+}
 /* ---------- tabs ---------- */
 .tabs{display:flex;gap:7px;overflow-x:auto;padding:4px 0 12px;-webkit-overflow-scrolling:touch}
 .tab{white-space:nowrap;background:#fff;border:1.5px solid var(--line);color:var(--mut);border-radius:999px;padding:9px 15px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
@@ -602,12 +618,12 @@ async function viewStudent(tab){
   const tabs=[['home','الرئيسية','home'],['att','حضوري','att'],['grades','درجاتي','chart'],['exams','الاختبارات','book'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['tools','أدوات ذكية','spark']];
   root.innerHTML=`
   ${heroHTML('أهلًا '+p.name.split(' ')[0]+' · '+(p.group_name?'شعبة '+p.group_name:S.brand.grade), true)}
-  <div class="wrap mt">
-    <div class="tabs">${tabs.map(t=>`<button class="tab ${tab===t[0]?'on':''}" onclick="viewStudent('${t[0]}')">${ic(t[2],16)} ${t[1]}</button>`).join('')}
-      <button class="tab" onclick="signOut()">${ic('out',16)} خروج</button></div>
-    <div id="sbody"><div class="center" style="padding:30px"><div class="spin" style="border-color:var(--pri);border-top-color:transparent"></div></div></div>
-    ${footHTML()}
-  </div>`;
+  <div class="wrap shellwrap mt"><div class="shell">
+    <nav class="tabs side">${tabs.map(t=>`<button class="tab ${tab===t[0]?'on':''}" onclick="viewStudent('${t[0]}')">${ic(t[2],16)} ${t[1]}</button>`).join('')}
+      <button class="tab" onclick="signOut()">${ic('out',16)} خروج</button></nav>
+    <div class="shbody"><div id="sbody"><div class="center" style="padding:30px"><div class="spin" style="border-color:var(--pri);border-top-color:transparent"></div></div></div>
+    ${footHTML()}</div>
+  </div></div>`;
   const body=document.getElementById('sbody');
   try{
     if(tab==='home') await studentHome(body);
@@ -1001,12 +1017,12 @@ function viewTeacher(tab){
   S.tab=tab;
   root.innerHTML=`
   ${heroHTML('لوحة تحكم المدرس', true)}
-  <div class="wrap mt">
-    <div class="tabs">${TTABS.map(t=>`<button class="tab ${tab===t[0]?'on':''}" onclick="viewTeacher('${t[0]}')">${ic(t[2],16)} ${t[1]}</button>`).join('')}
-      <button class="tab" onclick="signOut()">${ic('out',16)} خروج</button></div>
-    <div id="tbody"><div class="center" style="padding:30px"><div class="spin" style="border-color:var(--pri);border-top-color:transparent"></div></div></div>
-    ${footHTML()}
-  </div>`;
+  <div class="wrap shellwrap mt"><div class="shell">
+    <nav class="tabs side">${TTABS.map(t=>`<button class="tab ${tab===t[0]?'on':''}" onclick="viewTeacher('${t[0]}')">${ic(t[2],16)} ${t[1]}</button>`).join('')}
+      <button class="tab" onclick="signOut()">${ic('out',16)} خروج</button></nav>
+    <div class="shbody"><div id="tbody"><div class="center" style="padding:30px"><div class="spin" style="border-color:var(--pri);border-top-color:transparent"></div></div></div>
+    ${footHTML()}</div>
+  </div></div>`;
   const body=document.getElementById('tbody');
   const fn={home:tHome,students:tStudents,att:tAtt,grades:tGrades,exams:tExams,files:tFiles,ann:tAnn,settings:tSettings}[tab];
   Promise.resolve(fn(body)).catch(e=>{body.innerHTML='<div class="card center"><p>'+esc(errMsg(e))+'</p></div>';});
