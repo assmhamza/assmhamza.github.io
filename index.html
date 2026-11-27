@@ -248,7 +248,7 @@ tr:last-child td{border-bottom:0}
 .cert .cdiv svg{color:#b45309}
 .cert .csub{font-size:15px;color:#57534e}
 .cert .csub b{color:#1e1b4b}
-.cert .cname{font-size:31px;font-weight:900;color:#92600a;margin:18px auto 10px;border-bottom:2px dashed #d9c58a;display:inline-block;padding:0 34px 10px}
+.cert .cname{font-size:31px;font-weight:900;color:#92600a;margin:18px auto 10px;border-bottom:2px dashed #d9c58a;display:inline-block;max-width:100%;white-space:nowrap;padding:0 34px 10px}
 .cert .creason{font-size:16.5px;color:#292524;line-height:2.15}
 .cert .crow{display:flex;justify-content:space-between;align-items:flex-end;margin-top:34px;text-align:center;position:relative}
 .cert .cstamp{margin-bottom:-8px}
@@ -1560,7 +1560,7 @@ function tCertRender(){
     <h1>شهادة تقدير</h1>
     <div class="cdiv"><span></span>${diamond}<span></span></div>
     <div class="csub">يشهد <b>${esc(S.brand.name)}</b> ${esc(S.brand.title)} بأن الطالب</div>
-    <div class="cname">${esc(s.name)}</div>
+    <div class="cname" style="font-size:${(s.name||'').length>22?'22px':(s.name||'').length>16?'27px':'31px'}">${esc(s.name)}</div>
     <div class="creason">${esc(reason)}${s.group_name?' · شعبة '+esc(s.group_name):''}<br>ونتمنى له دوام التوفيق والنجاح</div>
     <div class="crow">
       <div class="sig">
@@ -2500,7 +2500,7 @@ async function sCert(body){
   const done=(lsn||[]).filter(x=>x.done).length, all=(lsn||[]).length;
   const items=[];
   if(all>0) items.push({k:'lessons',ti:'شهادة إتمام مسار الدروس',ok:done===all,prog:'خلّصت '+done+' من '+all+' درس',reason:'لإتمامه جميع دروس مسار البرمجة بنجاح'});
-  items.push({k:'grade',ti:'شهادة التفوق',ok:gp!=null&&gp>=min,prog:gp==null?'لسه مفيش درجات':'نسبتك '+gp+'% والمطلوب '+min+'%',reason:'لتفوقه في مادة البرمجة وحصوله على '+gp+'% في التقييمات والاختبارات'});
+  items.push({k:'grade',ti:'شهادة التفوق',ok:gp!=null&&gp>=min,prog:gp==null?'لسه مفيش درجات':'نسبتك '+gp+'% والمطلوب '+min+'%',reason:gp==null?'لتفوقه في مادة البرمجة':'لتفوقه في مادة البرمجة وحصوله على '+gp+'% في التقييمات والاختبارات'});
   window._certItems=items;
   body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('medal',17)}</span><h3>شهاداتي</h3></div>
     <p class="mut">لما تحقق الشرط بتظهر لك الشهادة وتقدر تطبعها أو تحفظها PDF.</p>
@@ -2508,7 +2508,7 @@ async function sCert(body){
       ${it.ok?`<button class="btn sm" onclick="sCertOpen(${i})">${ic('print',15)} الشهادة</button>`:'<span class="badge y">لسه</span>'}</div>`).join('')}</div>`;
 }
 function sCertOpen(i){
-  const it=window._certItems[i]; certStudent=S.profile;
+  const it=window._certItems[i]; if(!it||!it.ok) return; certStudent=S.profile;
   root.innerHTML=`<div class="wrap no-print"><div class="row mt mb"><button class="btn sm sec" onclick="viewStudent('cert')">${ic('back',15)} رجوع</button>
     <button class="btn sm" onclick="window.print()">${ic('print',15)} طباعة / حفظ PDF</button></div>
     <input type="hidden" id="cert-reason" value="${esc(it.reason)}"></div>
@@ -2622,7 +2622,7 @@ async function tLiveToggle(id,a){ try{ await api(sb.from('live_sessions').update
 async function tLiveDel(id){ if(!confirm('تحذف الحصة؟')) return; try{ await api(sb.from('live_sessions').delete().eq('id',id)); viewTeacher('live'); }catch(e){toast(errMsg(e),true);} }
 
 /* ===================== تنبيه نسخة جديدة ===================== */
-const BUILD='f5';
+const BUILD='f6';
 let buildShown=false;
 async function checkBuild(){
   if(buildShown) return;
