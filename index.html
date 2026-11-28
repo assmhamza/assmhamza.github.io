@@ -272,6 +272,33 @@ tr:last-child td{border-bottom:0}
 }
 pre#testlog{direction:ltr;text-align:left;background:#0f172a;color:#a5f3fc;font-size:12px;padding:12px;border-radius:10px;white-space:pre-wrap}
 .imgbox{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px;cursor:zoom-out}.imgbox img{max-width:100%;max-height:100%;border-radius:10px}
+.idc{width:540px;max-width:100%;background:#fff;border-radius:22px;box-shadow:var(--sh);overflow:hidden;margin:0 auto;border:1px solid var(--line);print-color-adjust:exact;-webkit-print-color-adjust:exact;break-inside:avoid}
+.idc-top{background:linear-gradient(120deg,#4f46e5,#0d9488);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;font-size:14px}
+.idc-top b{font-size:17px}
+.idc-body{display:flex;align-items:center;gap:16px;padding:18px 20px}
+.idc-ph{width:112px;height:112px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#e0e7ff,#c7d2fe);display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:800;color:var(--pri-d);flex-shrink:0}
+.idc-ph img{width:100%;height:100%;object-fit:cover}
+.idc-info{flex:1;min-width:0}
+.idc-name{font-size:21px;font-weight:800;line-height:1.35;word-break:break-word}
+.idc-grp{color:var(--pri-d);font-weight:700;margin-top:4px}
+.idc-t{color:var(--mut);font-size:13px;margin-top:6px}
+.idc-qr{flex-shrink:0;border:1px solid var(--line);border-radius:12px;padding:2px;background:#fff;line-height:0}
+.idc-foot{background:#f6f8fd;color:var(--mut);font-size:12px;text-align:center;padding:8px 10px}
+.idc-sheet .idc{width:100%}
+.idc-sheet{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:14px;max-width:1100px;margin:0 auto}
+@media (max-width:560px){.idc-body{flex-wrap:wrap;justify-content:center;text-align:center}.idc-qr{order:3}.idc-sheet{grid-template-columns:1fr}}
+@media print{.idc-sheet{grid-template-columns:repeat(2,1fr);gap:8mm;padding:0}.idc{box-shadow:none;border:1px solid #bbb}}
+.b5modal{position:fixed;inset:0;background:rgba(15,23,42,.72);z-index:9998;display:flex;align-items:center;justify-content:center;padding:12px}
+.b5box{background:#fff;border-radius:20px;padding:16px;max-width:520px;width:100%;max-height:92vh;overflow:auto}
+.scanv{position:relative;background:#000;border-radius:14px;overflow:hidden;aspect-ratio:1/1;max-height:52vh;margin:0 auto}
+.scanv video{width:100%;height:100%;object-fit:cover}
+.scanfr{position:absolute;inset:18%;border:3px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.28);pointer-events:none}
+.scanres{margin:10px 0;padding:10px;border-radius:12px;background:#f6f8fd;display:flex;gap:10px;align-items:center;min-height:52px}
+.scanres.ok{background:#dcfce7}.scanres.dup{background:#fef9c3}.scanres.bad{background:#fee2e2}
+.scanres img{width:48px;height:48px;border-radius:12px;object-fit:cover}
+.cqr{position:absolute;left:84px;top:26px;z-index:3;text-align:center;font-size:9px;line-height:1.4;color:#78350f;background:#fff;padding:4px;border:1px solid #d9c58a;border-radius:6px}
+.cqr svg{display:block;margin:0 auto 2px}
+.vfy{max-width:460px;margin:60px auto;text-align:center}
 </style>
 </head>
 <body>
@@ -531,6 +558,7 @@ async function loadGroups(){
 async function boot(){
   root.innerHTML = '<div class="wrap center" style="padding-top:80px"><div class="spin" style="border-color:var(--pri);border-top-color:transparent"></div><p class="mut mt">جاري التحميل...</p></div>';
   try{
+    { const cp=new URLSearchParams(location.search).get('cert'); if(cp){ await viewVerify(cp); return; } }
     const {data:{session}} = await sb.auth.getSession();
     S.session = session;
     await Promise.all([loadGroups(), loadBranding()]);
@@ -685,7 +713,7 @@ async function viewStudent(tab){
   if(S.profile && S.profile.active===false) return viewStudentPending();
   S.tab=tab;
   const p=S.profile;
-  const tabs=[['home','الرئيسية','home'],['att','حضوري','att'],['grades','درجاتي','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['py','محرر بايثون','code'],['rank','الترتيب والشارات','medal'],['lessons','مسار الدروس','book'],['live','حصص أونلاين','play'],['quiz','مسابقة مباشرة','star'],['qb','بنك التدريب','book'],['daily','تحدي اليوم','spark'],['proj','المشاريع','palette'],['cert','شهاداتي','medal'],['ask','اسأل المدرس','chat'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['tools','أدوات ذكية','spark']];
+  const tabs=[['home','الرئيسية','home'],['att','حضوري','att'],['grades','درجاتي','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['py','محرر بايثون','code'],['rank','الترتيب والشارات','medal'],['lessons','مسار الدروس','book'],['live','حصص أونلاين','play'],['quiz','مسابقة مباشرة','star'],['qb','بنك التدريب','book'],['daily','تحدي اليوم','spark'],['proj','المشاريع','palette'],['cert','شهاداتي','medal'],['idc','بطاقتي','user'],['ask','اسأل المدرس','chat'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['tools','أدوات ذكية','spark']];
   root.innerHTML=`
   ${heroHTML('أهلًا '+p.name.split(' ')[0]+' · '+(p.group_name?'شعبة '+p.group_name:S.brand.grade), true)}
   <div class="wrap shellwrap mt"><div class="shell">
@@ -710,6 +738,7 @@ async function viewStudent(tab){
     else if(tab==='daily') await sDaily(body);
     else if(tab==='proj') await sProj(body);
     else if(tab==='cert') await sCert(body);
+    else if(tab==='idc') await sIdCard(body);
     else if(tab==='ask') await sAsk(body);
     else if(tab==='files') await studentFiles(body);
     else if(tab==='ann') await studentAnn(body);
@@ -1229,7 +1258,7 @@ function renderStudentList(){
     const p=stAttPer[s.id]; const ap=p&&p.t?Math.round(p.p/p.t*100):null;
     return `
     <div class="frow">
-      <div class="avatar">${esc(s.name[0]||'؟')}</div>
+      ${avHTML(s)}
       <div class="grow">
         <div style="font-weight:700">${esc(s.name)}</div>
         <div class="hint">${esc(s.group_name||'بدون شعبة')}${s.phone?' · '+esc(s.phone):''} · سجل ${L.fmtDateAr(s.created_at)}</div>
@@ -1239,6 +1268,7 @@ function renderStudentList(){
       ${s.active===false?`<button class="btn sm ok" title="تفعيل الطالب" onclick="tSetActive('${s.id}',true)">${ic('check',15)} تفعيل</button>`:`<button class="btn sm out" title="إيقاف الطالب" onclick="tSetActive('${s.id}',false)">${ic('pause',15)}</button>`}
       <button class="btn sm out" title="تقرير الطالب" onclick="tReport('${s.id}')">${ic('print',15)}</button>
       <button class="btn sm out" title="شهادة تقدير" onclick="tCert('${s.id}')">${ic('medal',15)}</button>
+      <button class="btn sm out" title="الصورة والبطاقة" onclick="tStuCard('${s.id}')">${ic('img',15)}</button>
       <button class="btn sm sec" title="إعادة الرقم السري" onclick="tResetPin('${s.id}','${esc(s.name)}')">${ic('key',15)}</button>
       <button class="btn sm dan" title="حذف" onclick="tDelStudent('${s.id}','${esc(s.name)}')">${ic('trash',15)}</button>
     </div>`;
@@ -1370,7 +1400,7 @@ function renderAttList(){
   document.getElementById('att-list').innerHTML=list.length?list.map(s=>{
     const m=attMarks[s.id]||'';
     return `<div class="frow">
-      <div class="grow" style="font-weight:700">${esc(s.name)}</div>
+      ${avHTML(s)}<div class="grow" style="font-weight:700">${esc(s.name)}</div>
       <div class="seg" style="width:210px">
         <button class="p ${m==='present'?'on':''}" onclick="attMarks['${s.id}']='present';renderAttList()">حاضر</button>
         <button class="l ${m==='late'?'on':''}" onclick="attMarks['${s.id}']='late';renderAttList()">متأخر</button>
@@ -1552,7 +1582,7 @@ async function tCert(id){ await loadSig();
     root.innerHTML=`
     <div class="wrap no-print"><div class="row mt mb">
       <button class="btn sm sec" onclick="viewTeacher('students')">${ic('back',15)} رجوع</button>
-      <button class="btn sm" onclick="window.print()">${ic('print',15)} طباعة الشهادة</button>
+      <button class="btn sm" onclick="tCertPrint()">${ic('print',15)} طباعة الشهادة</button>
     </div>
     <div class="card mb"><div class="field"><label>نص الشهادة</label><input id="cert-reason" value="${esc(reason)}" oninput="tCertRender()"></div>
     <p class="hint">عدّل النص زي ما تحب والمعاينة تحته بتتحدث على طول.</p></div></div>
@@ -2419,7 +2449,7 @@ function trRender(){
   document.getElementById('tr-list').innerHTML=list.length?list.map(x=>{
     const st={me:x.me,rank:x.rank?{rank:x.rank,size:x.size}:null};
     const bs=BADGES.filter(b=>b[0]!=='مبرمج بايثون'&&(()=>{try{return b[2](st);}catch(e){return false;}})());
-    return `<div class="frow" style="flex-wrap:wrap"><div class="avatar">${x.rank||'—'}</div>
+    return `<div class="frow" style="flex-wrap:wrap">${avHTML({id:x.id,name:String(x.rank||'—')})}<span class="badge ${x.rank===1?'y':'g'}" style="min-width:26px;justify-content:center">${x.rank||'—'}</span>
       <div class="grow"><b>${esc(x.name)}</b><div class="hint">${esc(x.group_name||'بدون شعبة')}${x.active===false?' · في انتظار التفعيل':''} · حضور ${x.me.att_present} · واجبات ${x.me.hw_n}</div>
       <div class="row" style="flex-wrap:wrap;gap:6px;margin-top:6px">${bs.length?bs.map(b=>`<span class="badge y">${ic('medal',12)} ${b[0]}</span>`).join(''):'<span class="hint">لسه من غير شارات</span>'}</div></div>
       <span class="badge ${x.rank===1?'y':'g'}">${x.me.total} نقطة</span>
@@ -2626,7 +2656,7 @@ async function tLiveToggle(id,a){ try{ await api(sb.from('live_sessions').update
 async function tLiveDel(id){ if(!confirm('تحذف الحصة؟')) return; try{ await api(sb.from('live_sessions').delete().eq('id',id)); viewTeacher('live'); }catch(e){toast(errMsg(e),true);} }
 
 /* ===================== تنبيه نسخة جديدة ===================== */
-const BUILD='f9';
+const BUILD='f10';
 let buildShown=false;
 async function checkBuild(){
   if(buildShown) return;
@@ -3067,6 +3097,242 @@ studentHome=async function(body){
     if(items.length) body.insertAdjacentHTML('afterbegin',`<div class="card"><div class="sec-title"><span class="tic">${ic('spark',17)}</span><h3>النهارده</h3></div>${items.join('')}</div>`);
   }catch(e){}
 };
+
+/* ===================== الدفعة 5: صورة الطالب، باركود شخصي، حضور بالمسح، التحقق من الشهادة ===================== */
+let tPh={};
+function safeImg(d){ return (typeof d==='string'&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(d))?d:''; }
+function avHTML(s){ const d=safeImg((tPh[s.id]||{}).data); return d?`<div class="avatar" style="padding:0;overflow:hidden"><img src="${d}" alt="" style="width:100%;height:100%;object-fit:cover"></div>`:`<div class="avatar">${esc((s.name||'؟')[0])}</div>`; }
+async function loadTPhotos(){ try{ const r=await api(sb.from('student_photos').select('student_id,data,status')); tPh={}; (r||[]).forEach(x=>{tPh[x.student_id]={data:x.data,status:x.status};}); }catch(e){} }
+async function photoFromFile(file){
+  if(!file||!/^image\//.test(file.type)) throw new Error('اختار ملف صورة');
+  const url=URL.createObjectURL(file); const img=new Image(); img.src=url;
+  try{ await img.decode(); }catch(e){ URL.revokeObjectURL(url); throw new Error('الصورة مش مقروءة، جرّب صورة تانية'); }
+  const side=Math.min(img.width,img.height), sx=(img.width-side)/2, sy=(img.height-side)/2;
+  const c=document.createElement('canvas'); c.width=c.height=320; const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,320,320); x.drawImage(img,sx,sy,side,side,0,0,320,320); URL.revokeObjectURL(url);
+  let q=.82, d=c.toDataURL('image/jpeg',q); while(d.length>140000&&q>.4){ q-=.1; d=c.toDataURL('image/jpeg',q); }
+  return d;
+}
+function loadQrLib(){ return loadScriptOnce('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js',()=>window.qrcode); }
+function qrModel(text){ const q=window.qrcode(0,'M'); q.addData(text); q.make(); return q; }
+function qrSvg(text,px){
+  const q=qrModel(text), n=q.getModuleCount(); let p='';
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(q.isDark(r,c)) p+='M'+(c+3)+' '+(r+3)+'h1v1h-1z';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n+6} ${n+6}" width="${px}" height="${px}" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="${p}" fill="#000"/></svg>`;
+}
+function verifyUrl(code){ const o=location.origin, base=/supabase\.co$/.test(location.hostname)?'https://assmhamza.github.io/':o+location.pathname; return base+'?cert='+code; }
+function idCardHTML(p,photo,token){
+  const d=safeImg(photo);
+  return `<div class="idc"><div class="idc-top"><span>${esc(S.brand.school)}</span><b>منصة البرمجة</b></div>
+  <div class="idc-body"><div class="idc-ph">${d?`<img src="${d}" alt="">`:esc((p.name||'؟')[0])}</div>
+  <div class="idc-info"><div class="idc-name">${esc(p.name)}</div><div class="idc-grp">${p.group_name?'شعبة '+esc(p.group_name):esc(S.brand.grade)}</div><div class="idc-t">${esc(S.brand.name)} · ${esc(S.brand.title)}</div></div>
+  <div class="idc-qr">${qrSvg('sq1:'+token,124)}</div></div>
+  <div class="idc-foot">بطاقة شخصية. الباركود بيسجّل حضورك، فمتشاركوش مع حد.</div></div>`;
+}
+function _rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
+async function idCardPng(p,photo,token,fname){
+  await loadQrLib(); try{ await document.fonts.ready; }catch(e){}
+  const W=1080,H=640,c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d');
+  const ff=getComputedStyle(document.body).fontFamily||'sans-serif';
+  x.fillStyle='#e8ecf6'; x.fillRect(0,0,W,H); x.fillStyle='#fff'; _rr(x,10,10,W-20,H-20,40); x.fill();
+  x.save(); _rr(x,10,10,W-20,H-20,40); x.clip();
+  const g=x.createLinearGradient(W,0,0,0); g.addColorStop(0,'#4f46e5'); g.addColorStop(1,'#0d9488'); x.fillStyle=g; x.fillRect(0,10,W,120);
+  x.fillStyle='#f6f8fd'; x.fillRect(0,H-70,W,60); x.restore();
+  x.direction='rtl'; x.textAlign='right'; x.textBaseline='middle';
+  x.fillStyle='#fff'; x.font='700 40px '+ff; x.fillText('منصة البرمجة',W-50,70);
+  x.font='500 30px '+ff; x.textAlign='left'; x.fillText(S.brand.school,50,70); x.textAlign='right';
+  const ps=270, px=W-50-ps, py=170;
+  x.save(); _rr(x,px,py,ps,ps,36); x.clip(); x.fillStyle='#c7d2fe'; x.fillRect(px,py,ps,ps);
+  const d=safeImg(photo);
+  if(d){ const im=new Image(); im.src=d; try{ await im.decode(); x.drawImage(im,px,py,ps,ps); }catch(e){} }
+  else{ x.fillStyle='#4338ca'; x.font='800 120px '+ff; x.textAlign='center'; x.fillText((p.name||'؟')[0],px+ps/2,py+ps/2); x.textAlign='right'; }
+  x.restore();
+  const tx=px-34; x.fillStyle='#131c33'; let fs=60; do{ x.font='800 '+fs+'px '+ff; fs-=3; }while(x.measureText(p.name).width>tx-385&&fs>26); x.fillText(p.name,tx,py+60);
+  x.fillStyle='#4338ca'; x.font='700 38px '+ff; x.fillText(p.group_name?'شعبة '+p.group_name:S.brand.grade,tx,py+135);
+  x.fillStyle='#5b6b8c'; x.font='500 30px '+ff; x.fillText(S.brand.name,tx,py+195); x.fillText(S.brand.title,tx,py+235);
+  const q=qrModel('sq1:'+token), n=q.getModuleCount(), qs=290, cell=qs/(n+6), qx=50, qy=170;
+  x.fillStyle='#fff'; x.fillRect(qx,qy,qs,qs); x.strokeStyle='#e3e8f4'; x.lineWidth=2; x.strokeRect(qx,qy,qs,qs); x.fillStyle='#000';
+  for(let r=0;r<n;r++) for(let k=0;k<n;k++) if(q.isDark(r,k)) x.fillRect(qx+(k+3)*cell,qy+(r+3)*cell,Math.ceil(cell),Math.ceil(cell));
+  x.fillStyle='#5b6b8c'; x.font='500 26px '+ff; x.textAlign='center'; x.fillText('بطاقة شخصية. الباركود بيسجّل حضورك، فمتشاركوش مع حد.',W/2,H-42);
+  const a=document.createElement('a'); a.href=c.toDataURL('image/png'); a.download=fname||'student-card.png'; document.body.appendChild(a); a.click(); a.remove();
+}
+function printCards(cards,backFn){
+  root.innerHTML=`<div class="wrap no-print"><div class="row mt mb"><button class="btn sm sec" onclick="${backFn}">${ic('back',15)} رجوع</button>
+    <button class="btn sm" onclick="window.print()">${ic('print',15)} طباعة / حفظ PDF</button></div></div>
+    <div class="idc-sheet">${cards.map(c=>idCardHTML(c.p,c.photo,c.token)).join('')}</div>`;
+}
+/* ---- الطالب: بطاقتي ---- */
+let myIdc=null;
+async function sIdCard(body){
+  await loadQrLib();
+  const [tok,ph]=await Promise.all([ api(sb.rpc('my_qr')), api(sb.from('student_photos').select('data,status')) ]);
+  const P=(ph&&ph[0])||null; myIdc={token:tok,photo:P&&P.data,status:P&&P.status,p:S.profile};
+  const st=!P?'<span class="badge y">لسه من غير صورة</span>':(P.status==='approved'?'<span class="badge g">الصورة اتوافق عليها</span>':'<span class="badge y">الصورة مستنية موافقة المدرس</span>');
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('user',17)}</span><h3>بطاقتي</h3></div>
+    ${tok?idCardHTML(S.profile,P&&P.data,tok):'<div class="empty">البطاقة مش متاحة دلوقتي</div>'}
+    <div class="row mt" style="flex-wrap:wrap;gap:8px;justify-content:center">
+      <button class="btn sm" onclick="sIdDl()">${ic('dl',15)} تحميل كصورة</button>
+      <button class="btn sm out" onclick="sIdPrint()">${ic('print',15)} طباعة / PDF</button></div></div>
+    <div class="card"><div class="sec-title"><span class="tic">${ic('img',17)}</span><h3>صورتي الشخصية</h3></div>
+    <p class="mut">ارفع صورة واضحة لوشك. صورتك بتظهر ليك وللمدرس بس، ومش بتظهر لزمايلك. المدرس بيوافق عليها قبل ما تظهر في البطاقة المحمّلة.</p>
+    <div class="mb">${st}</div>
+    <div class="row" style="flex-wrap:wrap;gap:8px"><label class="btn sm">${ic('plus',15)} ${P?'تغيير الصورة':'رفع صورة'}<input type="file" accept="image/*" style="display:none" onchange="sPhotoUp(this)"></label>
+    ${P?`<button class="btn sm dan" onclick="sPhotoDel()">${ic('trash',15)} حذف الصورة</button>`:''}</div></div>`;
+}
+async function sPhotoUp(inp){
+  const f=inp.files&&inp.files[0]; if(!f) return;
+  try{ const d=await photoFromFile(f); const r=await api(sb.rpc('set_my_photo',{p_data:d}));
+    if(!r||!r.ok) throw new Error('مقدرناش نحفظ الصورة'); toast('اترفعت الصورة، مستنية موافقة المدرس'); viewStudent('idc');
+  }catch(e){toast(errMsg(e),true);}
+}
+async function sPhotoDel(){ if(!confirm('تحذف صورتك؟')) return; try{ await api(sb.rpc('del_my_photo')); toast('اتحذفت الصورة'); viewStudent('idc'); }catch(e){toast(errMsg(e),true);} }
+async function sIdDl(){ if(!myIdc||!myIdc.token) return; try{ await idCardPng(myIdc.p,myIdc.status==='approved'?myIdc.photo:null,myIdc.token,'student-card.png'); }catch(e){toast(errMsg(e),true);} }
+function sIdPrint(){ if(!myIdc||!myIdc.token) return; printCards([{p:myIdc.p,photo:myIdc.status==='approved'?myIdc.photo:null,token:myIdc.token}],"viewStudent('idc')"); }
+/* ---- المدرس: الصور والبطاقات ---- */
+function closeB5(){ const m=document.getElementById('b5m'); if(m) m.remove(); }
+function b5Modal(html,sticky){ closeB5(); const m=document.createElement('div'); m.id='b5m'; m.className='b5modal no-print'; m.innerHTML='<div class="b5box">'+html+'</div>'; if(!sticky) m.addEventListener('click',e=>{if(e.target===m)closeB5();}); document.body.appendChild(m); }
+function renderPhotoBar(){
+  const el=document.getElementById('ph-pend'); if(!el) return;
+  const pend=stCache.filter(s=>tPh[s.id]&&tPh[s.id].status==='pending');
+  el.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('img',17)}</span><h3>صور الطلاب وبطاقاتهم</h3></div>
+    <div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn sm" onclick="tPrintCards()">${ic('print',15)} طباعة بطاقات الطلاب${stGroup?' (شعبة '+esc(stGroup)+')':''}</button></div>
+    ${pend.length?`<div class="mt"><b>${pend.length} ${pend.length===1?'صورة':'صور'} مستنية موافقتك</b>${pend.map(s=>`<div class="frow">${avHTML(s)}<div class="grow"><b>${esc(s.name)}</b><div class="hint">${esc(s.group_name||'بدون شعبة')}</div></div>
+      <button class="btn sm ok" onclick="tPhReview('${s.id}',true)">${ic('check',15)} موافقة</button><button class="btn sm dan" onclick="tPhReview('${s.id}',false)">${ic('trash',15)} رفض</button></div>`).join('')}</div>`:''}</div>`;
+}
+async function tPhReview(id,ok){
+  try{ await api(sb.rpc('review_photo',{p_student:id,p_ok:ok})); if(ok){ if(tPh[id]) tPh[id].status='approved'; } else delete tPh[id];
+    toast(ok?'اتوافق على الصورة':'اتحذفت الصورة'); closeB5(); renderPhotoBar(); renderStudentList();
+  }catch(e){toast(errMsg(e),true);}
+}
+async function tPhSet(id,inp){
+  const f=inp.files&&inp.files[0]; if(!f) return;
+  try{ const d=await photoFromFile(f); const r=await api(sb.rpc('teacher_set_photo',{p_student:id,p_data:d})); if(!r||!r.ok) throw new Error('مقدرناش نحفظ الصورة');
+    tPh[id]={data:d,status:'approved'}; toast('اتحفظت الصورة'); closeB5(); renderPhotoBar(); renderStudentList();
+  }catch(e){toast(errMsg(e),true);}
+}
+async function tStuCard(id){
+  const s=stCache.find(x=>x.id===id); if(!s) return; const p=tPh[id]; const d=safeImg(p&&p.data);
+  b5Modal(`<div class="row mb"><h3 class="grow" style="margin:0">${esc(s.name)}</h3><button class="btn sm sec" onclick="closeB5()">إغلاق</button></div>
+    <div class="center mb">${d?`<img src="${d}" alt="" style="width:180px;height:180px;object-fit:cover;border-radius:22px">`:'<div class="empty">مفيش صورة للطالب</div>'}
+    <div class="mt">${!p?'':(p.status==='approved'?'<span class="badge g">موافق عليها</span>':'<span class="badge y">مستنية موافقتك</span>')}</div></div>
+    <div class="row" style="flex-wrap:wrap;gap:8px;justify-content:center">
+    ${p&&p.status==='pending'?`<button class="btn sm ok" onclick="tPhReview('${id}',true)">${ic('check',15)} موافقة</button>`:''}
+    <label class="btn sm">${ic('plus',15)} ${p?'استبدال الصورة':'رفع صورة'}<input type="file" accept="image/*" style="display:none" onchange="tPhSet('${id}',this)"></label>
+    ${p?`<button class="btn sm dan" onclick="tPhReview('${id}',false)">${ic('trash',15)} حذف الصورة</button>`:''}
+    <button class="btn sm out" onclick="tOneCard('${id}')">${ic('print',15)} البطاقة</button>
+    <button class="btn sm sec" onclick="tRegenQr('${id}','${esc(s.name)}')">${ic('key',15)} باركود جديد</button></div>
+    <p class="hint mt">الباركود الجديد بيلغي القديم، والطالب هيلاقي بطاقته الجديدة في تبويب "بطاقتي".</p>`);
+}
+async function tOneCard(id){
+  try{ await loadQrLib(); const qs=await api(sb.rpc('teacher_qrs')); const t=(qs||[]).find(x=>x.student_id===id); const s=stCache.find(x=>x.id===id); if(!t||!s) throw new Error('البطاقة مش متاحة');
+    closeB5(); const p=tPh[id]; printCards([{p:s,photo:p&&p.status==='approved'?p.data:null,token:t.token}],"viewTeacher('students')");
+  }catch(e){toast(errMsg(e),true);}
+}
+async function tRegenQr(id,name){
+  if(!confirm('تعمل باركود جديد لـ '+name+'؟ القديم هيبطل يشتغل.')) return;
+  try{ const t=await api(sb.rpc('regen_qr',{p_student:id})); if(!t) throw new Error('محصلش'); toast('اتعمل باركود جديد'); closeB5(); }catch(e){toast(errMsg(e),true);}
+}
+async function tPrintCards(){
+  try{ await loadQrLib(); const qs=await api(sb.rpc('teacher_qrs')); const tk={}; (qs||[]).forEach(x=>tk[x.student_id]=x.token);
+    const list=stCache.filter(s=>s.active!==false&&(!stGroup||s.group_name===stGroup)&&tk[s.id]);
+    if(!list.length) return toast('مفيش طلاب مفعّلين للطباعة',true);
+    printCards(list.map(s=>{const p=tPh[s.id]; return {p:s,photo:p&&p.status==='approved'?p.data:null,token:tk[s.id]};}),"viewTeacher('students')");
+  }catch(e){toast(errMsg(e),true);}
+}
+const _tStudentsB5=tStudents;
+tStudents=async function(body){
+  await _tStudentsB5(body);
+  body.insertAdjacentHTML('afterbegin','<div id="ph-pend"></div>');
+  await loadTPhotos(); renderPhotoBar(); renderStudentList();
+};
+/* ---- المدرس: الحضور بمسح الباركود ---- */
+let scn={stream:null,run:false,last:'',lastAt:0,det:null,cnt:0,busy:false,raf:0};
+const _tAttB5=tAtt;
+tAtt=async function(body,date){
+  await _tAttB5(body,date);
+  body.insertAdjacentHTML('afterbegin',`<div class="card"><div class="sec-title"><span class="tic">${ic('att',17)}</span><h3>تسجيل الحضور بالباركود</h3></div>
+    <p class="mut">افتح الكاميرا ووجّهها ناحية باركود بطاقة كل طالب، وهيتسجل حاضر على طول.</p>
+    <button class="btn" onclick="tScanOpen()">${ic('att',17)} فتح ماسح الباركود</button></div>`);
+};
+function scnMsg(t,cls,img){ const el=document.getElementById('scan-res'); if(!el) return; el.className='scanres '+(cls||''); el.innerHTML=(img?`<img src="${img}" alt="">`:'')+'<div>'+t+'</div>'; }
+async function tScanOpen(){
+  b5Modal(`<div class="row mb"><h3 class="grow" style="margin:0">مسح باركود الحضور</h3><button class="btn sm sec" onclick="tScanClose()">إغلاق</button></div>
+    <div class="scanv"><video id="scan-v" playsinline muted></video><div class="scanfr"></div></div>
+    <div id="scan-res" class="scanres">جاري فتح الكاميرا...</div><div class="hint">اتسجّل في الجلسة دي: <b id="scan-n">0</b></div>`,true);
+  scn.cnt=0; scn.last=''; scn.lastAt=0; scn.busy=false;
+  try{
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) throw new Error('المتصفح ده مش بيدعم الكاميرا');
+    scn.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+    const vid=document.getElementById('scan-v'); vid.srcObject=scn.stream; await vid.play();
+    scn.det=null; if('BarcodeDetector' in window){ try{ scn.det=new BarcodeDetector({formats:['qr_code']}); }catch(e){ scn.det=null; } }
+    if(!scn.det) await loadScriptOnce('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js',()=>window.jsQR);
+    scnMsg('وجّه الكاميرا ناحية باركود الطالب'); scn.run=true; scnLoop();
+  }catch(e){ scnMsg(e&&e.name==='NotAllowedError'?'لازم تسمح للمتصفح باستخدام الكاميرا':esc(errMsg(e)),'bad'); }
+}
+function scnLoop(){
+  if(!scn.run) return;
+  const vid=document.getElementById('scan-v'); if(!vid){ scn.run=false; return; }
+  const next=()=>{ scn.raf=setTimeout(scnLoop,160); };
+  if(scn.busy||vid.readyState<2){ next(); return; }
+  (async()=>{
+    let txt='';
+    try{
+      if(scn.det){ const r=await scn.det.detect(vid); if(r&&r[0]) txt=r[0].rawValue||''; }
+      else{ const w=480,h=Math.round(vid.videoHeight*w/(vid.videoWidth||w)); const c=scn._c||(scn._c=document.createElement('canvas')); c.width=w; c.height=h||w; const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(vid,0,0,c.width,c.height); const im=x.getImageData(0,0,c.width,c.height); const r=window.jsQR(im.data,c.width,c.height,{inversionAttempts:'dontInvert'}); if(r) txt=r.data||''; }
+    }catch(e){}
+    if(txt&&txt.indexOf('sq1:')===0){ const now=Date.now(); if(txt!==scn.last||now-scn.lastAt>5000){ scn.last=txt; scn.lastAt=now; await scnHandle(txt.slice(4)); } }
+    next();
+  })();
+}
+function scnBeep(ok){ try{ const a=new (window.AudioContext||window.webkitAudioContext)(); const o=a.createOscillator(); o.frequency.value=ok?880:300; o.connect(a.destination); o.start(); setTimeout(()=>{o.stop();a.close();},ok?120:300); }catch(e){} }
+async function scnHandle(tok){
+  scn.busy=true;
+  try{
+    const r=await api(sb.rpc('scan_attend',{p_token:tok}));
+    if(r&&r.ok){ const ph=safeImg(r.photo);
+      if(r.already){ scnMsg('<b>'+esc(r.name)+'</b><br>متسجّل حاضر قبل كده','dup',ph); scnBeep(false); }
+      else{ scn.cnt++; const n=document.getElementById('scan-n'); if(n) n.textContent=scn.cnt; scnMsg('<b>'+esc(r.name)+'</b><br>اتسجّل حاضر'+(r.group?' · شعبة '+esc(r.group):''),'ok',ph); scnBeep(true); }
+    }else if(r&&r.error==='inactive') scnMsg('<b>'+esc(r.name||'')+'</b><br>الطالب ده لسه متفعلش','bad');
+    else if(r&&r.error==='unknown'){ scnMsg('الباركود ده مش مسجّل (ممكن يكون اتغيّر)','bad'); scnBeep(false); }
+    else scnMsg('محصلش تسجيل','bad');
+  }catch(e){ scnMsg(esc(errMsg(e)),'bad'); }
+  scn.busy=false;
+}
+function tScanClose(){
+  scn.run=false; clearTimeout(scn.raf); if(scn.stream){ scn.stream.getTracks().forEach(t=>t.stop()); scn.stream=null; }
+  const n=scn.cnt; closeB5(); if(n&&S.tab==='att') tAtt(document.getElementById('tbody'),attDate);
+}
+/* ---- الشهادات: باركود التحقق ---- */
+let certCode=null;
+const _tCertB5=tCert;
+tCert=async function(id){ certCode=null; await _tCertB5(id); };
+async function tCertPrint(){
+  try{ await loadQrLib(); const reason=(document.getElementById('cert-reason')||{}).value||'لتميزه وتفوقه في مادة البرمجة';
+    const r=await api(sb.rpc('teacher_issue_cert',{p_student:certStudent.id,p_reason:reason})); if(!r||!r.ok) throw new Error('مقدرناش نصدر الشهادة');
+    certCode=r.code; tCertRender(); setTimeout(()=>window.print(),400);
+  }catch(e){toast(errMsg(e),true);}
+}
+const _tCertRenderB5=tCertRender;
+tCertRender=function(){
+  _tCertRenderB5();
+  const f=document.getElementById('cert-frame'); if(!f||!certCode||!window.qrcode) return;
+  f.insertAdjacentHTML('beforeend',`<div class="cqr">${qrSvg(verifyUrl(certCode),78)}<span>امسح للتحقق من الشهادة<br>${esc(certCode)}</span></div>`);
+};
+const _sCertOpenB5=sCertOpen;
+sCertOpen=async function(i){
+  certCode=null; const it=window._certItems[i];
+  try{ await loadQrLib(); if(it&&it.ok){ const r=await api(sb.rpc('issue_cert',{p_kind:it.k})); if(r&&r.ok) certCode=r.code; } }catch(e){}
+  await _sCertOpenB5(i);
+};
+async function viewVerify(code){
+  try{ await loadBranding(); }catch(e){}
+  let r=null,err=false; try{ const x=await sb.rpc('verify_cert',{p_code:String(code).slice(0,40)}); if(x.error) err=true; else r=x.data; }catch(e){ err=true; }
+  const home='location.href=location.pathname';
+  root.innerHTML=`<div class="wrap"><div class="card vfy">${err?`<p style="font-size:44px;color:var(--warn)">${ic('alert',44)}</p><h2>مقدرناش نتحقق دلوقتي</h2><p class="mut">جرّب تاني بعد شوية.</p>`
+   :(r&&r.ok?`<p style="font-size:48px;color:var(--ok)">${ic('check',48)}</p><h2>شهادة أصلية</h2><p class="mut">الشهادة دي صادرة فعلًا من منصة البرمجة · ${esc(S.brand.school)}</p>
+    <div class="frow" style="justify-content:center;flex-direction:column;gap:4px"><b style="font-size:20px">${esc(r.name)}</b><div>${esc(r.reason)}</div><div class="hint">تاريخ الإصدار: ${L.fmtDateAr(String(r.issued_at).slice(0,10))}</div></div>`
+   :`<p style="font-size:48px;color:var(--dan)">${ic('alert',48)}</p><h2>الشهادة دي مش موجودة</h2><p class="mut">الرمز ده مش مسجّل عندنا. اتأكد إنك مسحت الباركود كامل.</p>`)}
+   <button class="btn mt" onclick="${home}">الصفحة الرئيسية</button></div></div>`;
+}
 
 </script>
 <script>boot();</script>
