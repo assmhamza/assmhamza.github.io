@@ -443,12 +443,11 @@ function ic(n,s){return '<span class="ic"><svg width="'+(s||20)+'" height="'+(s|
 /* ================= branding ================= */
 const BRAND_DEF={name:'مستر عاصم حمزة',title:'معلم البرمجة',school:'مدرسة قطور الثانوية',grade:'الصف الثاني الثانوي'};
 let S = {session:null, role:null, profile:null, groups:[], tab:'', brand:{...BRAND_DEF}, signature:null, tstyle:null};
+async function loadSig(){ try{ const d=await api(sb.rpc('get_signature')); S.signature=(typeof d==='string'&&/^data:image\/png;base64,/.test(d))?d:null; }catch(e){ S.signature=null; } }
 async function loadBranding(){
   try{
     const rows = await api(sb.from('settings').select('value').eq('key','branding'));
     if(rows && rows[0] && rows[0].value) S.brand = {...BRAND_DEF, ...rows[0].value};
-    const sig = await api(sb.from('settings').select('value').eq('key','signature'));
-    if(sig && sig[0] && sig[0].value && sig[0].value.data) S.signature = sig[0].value.data;
     const tsr = await api(sb.from('settings').select('value').eq('key','textstyle'));
     if(tsr && tsr[0] && tsr[0].value) S.tstyle = tsr[0].value;
   }catch(e){ /* keep defaults */ }
@@ -1518,7 +1517,7 @@ async function tQuestionDelete(qid,examId){
 
 /* ---- teacher: certificates ---- */
 let certStudent=null;
-async function tCert(id){
+async function tCert(id){ await loadSig();
   try{
     const [stu,att,asm,scores]=await Promise.all([
       api(sb.from('students').select('*').eq('id',id)),
@@ -2471,15 +2470,15 @@ async function tSigUpload(inp){
     const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h);
     const data=c.toDataURL('image/png'); URL.revokeObjectURL(url);
     if(data.length>600000) return toast('الصورة كبيرة، جرّب صورة أصغر',true);
-    await api(sb.from('settings').upsert({key:'signature',value:{data}})); S.signature=data;
+    await api(sb.from('teacher_private').upsert({key:'signature',value:{data}})); S.signature=data;
     document.getElementById('sig-prev').innerHTML='<img src="'+data+'" style="max-height:70px">'; toast('اتحفظ التوقيع');
   }catch(e){toast(errMsg(e),true);}
 }
-async function tSigRemove(){ try{ await api(sb.from('settings').delete().eq('key','signature')); S.signature=null; document.getElementById('sig-prev').innerHTML='<span class="hint">مفيش توقيع</span>'; toast('اتشال التوقيع'); }catch(e){toast(errMsg(e),true);} }
+async function tSigRemove(){ try{ await api(sb.from('teacher_private').delete().eq('key','signature')); S.signature=null; document.getElementById('sig-prev').innerHTML='<span class="hint">مفيش توقيع</span>'; toast('اتشال التوقيع'); }catch(e){toast(errMsg(e),true);} }
 async function tCertMinSave(){ const n=Number(v('cert-min')); if(!(n>=1&&n<=100)) return toast('اكتب نسبة من 1 لـ 100',true); try{ await api(sb.from('settings').upsert({key:'cert_min',value:{min:n}})); toast('اتحفظت النسبة'); }catch(e){toast(errMsg(e),true);} }
 const _tSettingsB3=tSettings;
 tSettings=async function(body){
-  await _tSettingsB3(body);
+  await _tSettingsB3(body); await loadSig();
   let min=85; try{ const r=await api(sb.from('settings').select('value').eq('key','cert_min')); if(r&&r[0]&&r[0].value&&r[0].value.min) min=Number(r[0].value.min); }catch(e){}
   body.insertAdjacentHTML('beforeend',`<div class="card"><div class="sec-title"><span class="tic">${ic('dl',17)}</span><h3>Excel كامل بضغطة واحدة</h3></div>
     <p class="mut">ملف Excel فيه شيتات: الطلاب، الحضور، الدرجات، الاختبارات، الواجبات.</p>
@@ -2507,8 +2506,8 @@ async function sCert(body){
     ${items.map((it,i)=>`<div class="frow"><div class="avatar">${ic('medal',18)}</div><div class="grow"><b>${it.ti}</b><div class="hint">${esc(it.prog)}</div></div>
       ${it.ok?`<button class="btn sm" onclick="sCertOpen(${i})">${ic('print',15)} الشهادة</button>`:'<span class="badge y">لسه</span>'}</div>`).join('')}</div>`;
 }
-function sCertOpen(i){
-  const it=window._certItems[i]; if(!it||!it.ok) return; certStudent=S.profile;
+async function sCertOpen(i){
+  const it=window._certItems[i]; if(!it||!it.ok) return; certStudent=S.profile; await loadSig();
   root.innerHTML=`<div class="wrap no-print"><div class="row mt mb"><button class="btn sm sec" onclick="viewStudent('cert')">${ic('back',15)} رجوع</button>
     <button class="btn sm" onclick="window.print()">${ic('print',15)} طباعة / حفظ PDF</button></div>
     <input type="hidden" id="cert-reason" value="${esc(it.reason)}"></div>
@@ -2622,7 +2621,7 @@ async function tLiveToggle(id,a){ try{ await api(sb.from('live_sessions').update
 async function tLiveDel(id){ if(!confirm('تحذف الحصة؟')) return; try{ await api(sb.from('live_sessions').delete().eq('id',id)); viewTeacher('live'); }catch(e){toast(errMsg(e),true);} }
 
 /* ===================== تنبيه نسخة جديدة ===================== */
-const BUILD='f6';
+const BUILD='f7';
 let buildShown=false;
 async function checkBuild(){
   if(buildShown) return;
