@@ -796,8 +796,17 @@ async function studentGrades(body){
   </div>`;
 }
 let sfCache=[];
+async function signFiles(list){
+  try{
+    const items=(list||[]).filter(f=>f&&f.kind!=='youtube'&&f.path);
+    if(!items.length) return list;
+    const {data}=await sb.storage.from('files').createSignedUrls(items.map(f=>f.path),3600);
+    (data||[]).forEach((d,i)=>{ if(d&&d.signedUrl) items[i].url=d.signedUrl; });
+  }catch(e){}
+  return list;
+}
 async function studentFiles(body){
-  const files = await api(sb.from('files_meta').select('*').order('created_at',{ascending:false}));
+  const files = await signFiles(await api(sb.from('files_meta').select('*').order('created_at',{ascending:false})));
   sfCache=files||[];
   body.innerHTML=`
   <div class="card">
@@ -1696,7 +1705,7 @@ function renderRank(){
 
 /* ---- teacher: files ---- */
 async function tFiles(body){
-  const files=await api(sb.from('files_meta').select('*').order('created_at',{ascending:false}));
+  const files=await signFiles(await api(sb.from('files_meta').select('*').order('created_at',{ascending:false})));
   body.innerHTML=`
   <div class="card">
     <div class="sec-title"><span class="tic">${ic('plus',17)}</span><h3>نشر ملف أو صورة أو فيديو</h3></div>
@@ -2251,7 +2260,7 @@ async function sLessons(body){
         ${l.done?'':`<button class="btn sm" onclick="sLessonDone(${l.id})">${ic('check',15)} خلّصت الدرس</button>`}</div>`}</div>`).join(''):'<div class="card"><div class="empty"><span class="eic">'+ic('book',24)+'</span>لسه مفيش دروس منشورة</div></div>'}`;
 }
 function sLessonVideo(id){const l=slData.find(x=>x.id===id); const y=ytId(l.video_url); if(!y) return toast('اللينك مش صحيح',true); openViewer('https://www.youtube-nocookie.com/embed/'+y+'?rel=0',l.title,l.video_url);}
-async function sLessonFile(id){const l=slData.find(x=>x.id===id); try{const f=await api(sb.from('files_meta').select('*').eq('id',l.file_id)); if(!f||!f[0]) return toast('الملف مش موجود',true); sfCache=[f[0]]; openFileViewer(f[0].id);}catch(e){toast(errMsg(e),true);}}
+async function sLessonFile(id){const l=slData.find(x=>x.id===id); try{const f=await api(sb.from('files_meta').select('*').eq('id',l.file_id)); if(!f||!f[0]) return toast('الملف مش موجود',true); await signFiles([f[0]]); sfCache=[f[0]]; openFileViewer(f[0].id);}catch(e){toast(errMsg(e),true);}}
 function sLessonHw(hid){viewStudent('hw'); setTimeout(()=>{try{sHwOpen(hid);}catch(e){}},1800);}
 async function sLessonDone(id){
   try{const r=await api(sb.rpc('complete_lesson',{p_lesson:id}));
@@ -2617,7 +2626,7 @@ async function tLiveToggle(id,a){ try{ await api(sb.from('live_sessions').update
 async function tLiveDel(id){ if(!confirm('تحذف الحصة؟')) return; try{ await api(sb.from('live_sessions').delete().eq('id',id)); viewTeacher('live'); }catch(e){toast(errMsg(e),true);} }
 
 /* ===================== تنبيه نسخة جديدة ===================== */
-const BUILD='f8';
+const BUILD='f9';
 let buildShown=false;
 async function checkBuild(){
   if(buildShown) return;
