@@ -271,6 +271,7 @@ tr:last-child td{border-bottom:0}
   .cert .frame{box-shadow:none}
 }
 pre#testlog{direction:ltr;text-align:left;background:#0f172a;color:#a5f3fc;font-size:12px;padding:12px;border-radius:10px;white-space:pre-wrap}
+.imgbox{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px;cursor:zoom-out}.imgbox img{max-width:100%;max-height:100%;border-radius:10px}
 </style>
 </head>
 <body>
@@ -684,7 +685,7 @@ async function viewStudent(tab){
   if(S.profile && S.profile.active===false) return viewStudentPending();
   S.tab=tab;
   const p=S.profile;
-  const tabs=[['home','الرئيسية','home'],['att','حضوري','att'],['grades','درجاتي','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['py','محرر بايثون','code'],['rank','الترتيب والشارات','medal'],['lessons','مسار الدروس','book'],['live','حصص أونلاين','play'],['cert','شهاداتي','medal'],['ask','اسأل المدرس','chat'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['tools','أدوات ذكية','spark']];
+  const tabs=[['home','الرئيسية','home'],['att','حضوري','att'],['grades','درجاتي','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['py','محرر بايثون','code'],['rank','الترتيب والشارات','medal'],['lessons','مسار الدروس','book'],['live','حصص أونلاين','play'],['quiz','مسابقة مباشرة','star'],['qb','بنك التدريب','book'],['daily','تحدي اليوم','spark'],['proj','المشاريع','palette'],['cert','شهاداتي','medal'],['ask','اسأل المدرس','chat'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['tools','أدوات ذكية','spark']];
   root.innerHTML=`
   ${heroHTML('أهلًا '+p.name.split(' ')[0]+' · '+(p.group_name?'شعبة '+p.group_name:S.brand.grade), true)}
   <div class="wrap shellwrap mt"><div class="shell">
@@ -704,6 +705,10 @@ async function viewStudent(tab){
     else if(tab==='rank') await sRank(body);
     else if(tab==='lessons') await sLessons(body);
     else if(tab==='live') await sLive(body);
+    else if(tab==='quiz') await sQuiz(body);
+    else if(tab==='qb') await sQb(body);
+    else if(tab==='daily') await sDaily(body);
+    else if(tab==='proj') await sProj(body);
     else if(tab==='cert') await sCert(body);
     else if(tab==='ask') await sAsk(body);
     else if(tab==='files') await studentFiles(body);
@@ -1088,7 +1093,7 @@ async function doTeacherLogin(){
 }
 
 /* ================= teacher shell ================= */
-const TTABS=[['home','الرئيسية','home'],['students','الطلاب','users'],['att','الحضور','att'],['grades','الدرجات','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['rank','الترتيب والشارات','medal'],['an','التحليلات','chart'],['lessons','الدروس','book'],['live','حصص أونلاين','play'],['qa','الأسئلة','chat'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['settings','الإعدادات','gear']];
+const TTABS=[['home','الرئيسية','home'],['students','الطلاب','users'],['att','الحضور','att'],['grades','الدرجات','chart'],['exams','الاختبارات','book'],['hw','الواجبات','clip'],['rank','الترتيب والشارات','medal'],['an','التحليلات','chart'],['lessons','الدروس','book'],['live','حصص أونلاين','play'],['quiz','مسابقة مباشرة','star'],['qbank','بنك الأسئلة','book'],['proj','مشاريع الطلاب','palette'],['qa','الأسئلة','chat'],['files','الملفات','folder'],['ann','الإعلانات','mega'],['settings','الإعدادات','gear']];
 function viewTeacher(tab){
   S.tab=tab;
   root.innerHTML=`
@@ -1100,7 +1105,7 @@ function viewTeacher(tab){
     ${footHTML()}</div>
   </div></div>`;
   const body=document.getElementById('tbody');
-  const fn={home:tHome,students:tStudents,att:tAtt,grades:tGrades,exams:tExams,hw:tHw,rank:tRank,an:tAnalytics,lessons:tLessons,live:tLive,qa:tQuestions,files:tFiles,ann:tAnn,settings:tSettings}[tab];
+  const fn={home:tHome,students:tStudents,att:tAtt,grades:tGrades,exams:tExams,hw:tHw,rank:tRank,an:tAnalytics,lessons:tLessons,live:tLive,quiz:tQuiz,qbank:tQbank,proj:tProj,qa:tQuestions,files:tFiles,ann:tAnn,settings:tSettings}[tab];
   Promise.resolve(fn(body)).catch(e=>{body.innerHTML='<div class="card center"><p>'+esc(errMsg(e))+'</p></div>';});
 }
 
@@ -2055,15 +2060,6 @@ function sHwOpen(id){
   </div>`;
   el.scrollIntoView({behavior:'smooth'});
 }
-async function sHwSubmit(id){
-  const c=v('hw-ans'); if(!c.trim()) return toast('اكتب إجابتك الأول',true);
-  const b=document.getElementById('hw-send'); b.disabled=true;
-  try{
-    const r=await api(sb.rpc('submit_hw',{p_hw:id,p_content:c}));
-    if(!r.ok){ const m={closed:'الموعد انتهى',graded:'الواجب اتصحح ومينفعش يتعدل',empty:'اكتب إجابتك الأول',too_long:'الإجابة طويلة جداً',not_found:'الواجب مش موجود',no_student:'حسابك مش مفعّل'}; throw new Error(m[r.error]||'تعذر التسليم'); }
-    toast('اتسلّم الواجب'); studentHwReload();
-  }catch(e){ toast(errMsg(e),true); b.disabled=false; }
-}
 function studentHwReload(){ viewStudent('hw'); }
 
 /* ===================== الترتيب والشارات ===================== */
@@ -2621,7 +2617,7 @@ async function tLiveToggle(id,a){ try{ await api(sb.from('live_sessions').update
 async function tLiveDel(id){ if(!confirm('تحذف الحصة؟')) return; try{ await api(sb.from('live_sessions').delete().eq('id',id)); viewTeacher('live'); }catch(e){toast(errMsg(e),true);} }
 
 /* ===================== تنبيه نسخة جديدة ===================== */
-const BUILD='f7';
+const BUILD='f8';
 let buildShown=false;
 async function checkBuild(){
   if(buildShown) return;
@@ -2674,6 +2670,394 @@ async function tCsv(){
     toast('اتحمل ملف الإكسل');
   }catch(e){toast(errMsg(e),true);}
 }
+
+/* ===================== الدفعة 4 ===================== */
+function imgBox(src){
+  const d=document.createElement('div'); d.className='imgbox no-print'; d.onclick=()=>d.remove();
+  d.innerHTML='<img alt="">'; d.firstChild.src=src; document.body.appendChild(d);
+}
+async function imgToJpeg(file){
+  if(!file||!/^image\//.test(file.type)) throw new Error('اختار ملف صورة');
+  const url=URL.createObjectURL(file); const img=new Image(); img.src=url;
+  try{ await img.decode(); }catch(e){ URL.revokeObjectURL(url); throw new Error('الصورة دي مش مدعومة، جرّب صورة JPG أو PNG'); }
+  let max=1100,q=0.72,data='';
+  for(let i=0;i<6;i++){
+    const sc=Math.min(1,max/Math.max(img.width,img.height)); const w=Math.max(1,Math.round(img.width*sc)),h=Math.max(1,Math.round(img.height*sc));
+    const c=document.createElement('canvas'); c.width=w; c.height=h; const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h);
+    data=c.toDataURL('image/jpeg',q); if(data.length<=240000) break; max=Math.round(max*0.8); q=Math.max(0.5,q-0.07);
+  }
+  URL.revokeObjectURL(url);
+  if(data.length>250000) throw new Error('الصورة كبيرة جداً، جرّب صورة أبسط');
+  return data;
+}
+function parseMcq(txt){
+  const out=[];
+  txt.split('\n').map(x=>x.trim()).filter(Boolean).forEach((ln,i)=>{
+    const p=ln.split('|').map(x=>x.trim());
+    if(p.length<4) throw new Error('سطر '+(i+1)+': لازم سؤال واختيارين على الأقل ورقم الإجابة الصحيحة');
+    const n=Number(p[p.length-1]), opts=p.slice(1,-1);
+    if(!p[0]||p[0].length>500||opts.length>6||opts.some(o=>!o||o.length>200)||!(n>=1&&n<=opts.length&&Number.isInteger(n))) throw new Error('سطر '+(i+1)+': راجع الاختيارات ورقم الإجابة الصحيحة');
+    out.push({question:p[0],options:opts,correct_index:n-1});
+  });
+  if(!out.length) throw new Error('اكتب سؤال واحد على الأقل');
+  return out;
+}
+const MCQ_FMT='السؤال | الاختيار الأول | الاختيار الثاني | الاختيار الثالث | رقم الإجابة الصحيحة';
+const LVL={easy:'سهل',medium:'متوسط',hard:'صعب'};
+const QCOL=['#e11d48','#2563eb','#d97706','#16a34a','#7c3aed','#0891b2'];
+
+/* ---- واجب بصور + تعليق المدرس ---- */
+let hwPics=[], hwSaved=[];
+const _sHwOpenB4=sHwOpen;
+sHwOpen=function(id){
+  hwPics=[]; hwSaved=[];
+  const r=_sHwOpenB4(id);
+  const h=hwStu.hws.find(x=>x.id===id); if(!h||h.auto) return r;
+  const s=hwStu.subs[id], closed=new Date(h.due_at).getTime()<Date.now(), graded=s&&s.graded_at!=null, canEdit=!closed&&!graded;
+  const card=document.querySelector('#hw-detail .card'); if(!card) return r;
+  if(s&&s.comment){ const f=card.querySelector('.field'); if(f) f.insertAdjacentHTML('beforebegin',`<div class="pendbar" style="background:#eef2ff;border-color:#a5b4fc;color:#3730a3">${ic('chat',15)} تعليق المدرس: ${esc(s.comment)}</div>`); }
+  const hasBtn=card.querySelector('#hw-send');
+  const box=`<div class="field" id="hw-imgfield"><label>صور مع الإجابة (اختياري، لحد 3 صور)</label><div id="hw-imgs" class="row" style="gap:8px;flex-wrap:wrap"></div>
+    ${canEdit?`<input type="file" id="hw-file" accept="image/*" multiple onchange="hwPick(this)"><div class="hint">الصورة بتتصغّر لوحدها قبل الرفع. لازم تضغط "تسليم" عشان الصور تتحفظ.</div>`:''}</div>`;
+  if(hasBtn) hasBtn.insertAdjacentHTML('beforebegin',box); else card.insertAdjacentHTML('beforeend',box);
+  (async()=>{ if(s){ try{ hwSaved=(await api(sb.from('hw_images').select('id,data').eq('submission_id',s.id).order('id')))||[]; }catch(e){} } hwImgDraw(canEdit); })();
+  return r;
+};
+function hwImgDraw(canEdit){
+  const el=document.getElementById('hw-imgs'); if(!el) return;
+  const th=(src,del)=>`<div style="position:relative"><img src="${src}" onclick="imgBox(this.src)" style="width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:pointer">${del?`<button class="btn sm dan" style="position:absolute;top:-6px;left:-6px;padding:2px 7px" onclick="${del}">×</button>`:''}</div>`;
+  el.innerHTML=hwSaved.map(x=>th(x.data,canEdit?`hwDelSaved(${x.id})`:'')).join('')+hwPics.map((d,i)=>th(d,`hwUnpick(${i})`)).join('')||'<span class="hint">مفيش صور</span>';
+}
+async function hwPick(inp){
+  const files=[...inp.files]; inp.value='';
+  for(const f of files){
+    if(hwSaved.length+hwPics.length>=3){ toast('أقصى حاجة 3 صور',true); break; }
+    try{ hwPics.push(await imgToJpeg(f)); }catch(e){ toast(errMsg(e),true); }
+  }
+  hwImgDraw(true);
+}
+function hwUnpick(i){ hwPics.splice(i,1); hwImgDraw(true); }
+async function hwDelSaved(id){
+  try{ const r=await api(sb.rpc('del_hw_image',{p_id:id})); if(!r.ok) throw new Error('تعذر الحذف'); hwSaved=hwSaved.filter(x=>x.id!==id); hwImgDraw(true); }catch(e){ toast(errMsg(e),true); }
+}
+async function sHwSubmit(id){
+  let c=v('hw-ans'); const pics=hwPics.slice(), had=hwSaved.length;
+  if(!c.trim()&&(pics.length||had)) c='(الإجابة في الصور المرفقة)';
+  if(!c.trim()) return toast('اكتب إجابتك الأول أو ارفع صورة',true);
+  const b=document.getElementById('hw-send'); b.disabled=true;
+  try{
+    const r=await api(sb.rpc('submit_hw',{p_hw:id,p_content:c}));
+    if(!r.ok){ const m={closed:'الموعد انتهى',graded:'الواجب اتصحح ومينفعش يتعدل',empty:'اكتب إجابتك الأول',too_long:'الإجابة طويلة جداً',not_found:'الواجب مش موجود',no_student:'حسابك مش مفعّل'}; throw new Error(m[r.error]||'تعذر التسليم'); }
+    let bad=0;
+    for(const d of pics){ const x=await api(sb.rpc('add_hw_image',{p_hw:id,p_data:d})); if(!x.ok){ bad++; if(x.error==='too_many') break; } }
+    hwPics=[]; toast(bad?'اتسلّم الواجب لكن بعض الصور متحفظتش':'اتسلّم الواجب'); studentHwReload();
+  }catch(e){ toast(errMsg(e),true); b.disabled=false; }
+}
+const _sHwB4=sHw;
+sHw=async function(body){
+  await _sHwB4(body);
+  try{
+    const rows=[...body.querySelectorAll('.frow')];
+    (hwStu.hws||[]).forEach((h,i)=>{ const s=hwStu.subs[h.id]; if(s&&s.comment&&rows[i]){ const g=rows[i].querySelector('.grow'); if(g) g.insertAdjacentHTML('beforeend',`<div class="hint" style="color:#4338ca">${ic('chat',13)} تعليق المدرس: ${esc(s.comment)}</div>`); } });
+  }catch(e){}
+};
+const _tHwOpenB4=tHwOpen;
+tHwOpen=async function(id){
+  await _tHwOpenB4(id);
+  try{
+    const subs=(await api(sb.from('hw_submissions').select('id,student_id,comment').eq('hw_id',id)))||[];
+    const ids=subs.map(x=>x.id); if(!ids.length) return;
+    const imgs=(await api(sb.from('hw_images').select('id,submission_id').in('submission_id',ids)))||[];
+    const cnt={}; imgs.forEach(x=>cnt[x.submission_id]=(cnt[x.submission_id]||0)+1);
+    subs.forEach(x=>{
+      const inp=document.getElementById('hs-'+x.id); if(!inp) return; const row=inp.closest('.row'); if(!row) return;
+      let html='';
+      if(cnt[x.id]) html+=`<div style="width:100%"><button class="btn sm sec" onclick="tHwImgs(${x.id},this)">${ic('img',15)} عرض الصور المرفقة (${cnt[x.id]})</button><div id="himg-${x.id}" class="row mt" style="gap:8px;flex-wrap:wrap"></div></div>`;
+      html+=`<div class="row" style="width:100%;margin-top:6px"><div class="field grow" style="margin:0"><input id="hc-${x.id}" maxlength="2000" placeholder="تعليق على الكود أو الإجابة (الطالب هيشوفه)" value="${esc(x.comment||'')}"></div><button class="btn sm sec" onclick="tHwComment(${x.id})">${ic('chat',15)} إرسال التعليق</button></div>`;
+      row.insertAdjacentHTML('beforebegin',html);
+    });
+  }catch(e){}
+};
+async function tHwImgs(subId,btn){
+  try{
+    const rows=(await api(sb.from('hw_images').select('id,data').eq('submission_id',subId).order('id')))||[];
+    document.getElementById('himg-'+subId).innerHTML=rows.map(x=>`<img src="${x.data}" onclick="imgBox(this.src)" style="width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:pointer">`).join('');
+    if(btn) btn.disabled=true;
+  }catch(e){ toast(errMsg(e),true); }
+}
+async function tHwComment(subId){
+  const c=v('hc-'+subId).trim();
+  try{ await api(sb.from('hw_submissions').update({comment:c,comment_at:c?new Date().toISOString():null}).eq('id',subId)); toast(c?'اتبعت التعليق للطالب':'اتمسح التعليق'); }catch(e){ toast(errMsg(e),true); }
+}
+
+/* ---- مسابقة مباشرة: المدرس ---- */
+let quizTimer=null, quizCd=null;
+async function tQuiz(body){
+  clearInterval(quizTimer); clearInterval(quizCd);
+  await loadGroups();
+  const qs=(await api(sb.from('live_quiz').select('*').order('id',{ascending:false}).limit(20)))||[];
+  const st={draft:'<span class="badge y">لسه ما بدأتش</span>',running:'<span class="badge g">شغالة</span>',ended:'<span class="badge b">خلصت</span>'};
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('plus',17)}</span><h3>مسابقة مباشرة جديدة</h3></div>
+    <p class="mut">تعرض سؤال والطلبة يجاوبوا من موبايلاتهم، والنقاط بتتحسب بسرعة الإجابة، وترتيب مباشر.</p>
+    <div class="field"><label>اسم المسابقة</label><input id="qz-t" maxlength="200" placeholder="مسابقة مراجعة الوحدة الأولى"></div>
+    <div class="row mb"><div class="field grow"><label>الشعبة</label><select id="qz-g"><option value="">كل الشعب</option>${S.groups.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('')}</select></div>
+      <div class="field grow"><label>وقت كل سؤال (ثواني)</label><input id="qz-s" type="number" min="5" max="120" value="20"></div></div>
+    <div class="field"><label>الأسئلة (كل سؤال في سطر، الصيغة: ${MCQ_FMT})</label><textarea id="qz-q" rows="7" placeholder="ما ناتج 2+3؟ | 4 | 5 | 6 | 2"></textarea></div>
+    <button class="btn sm" onclick="tQuizCreate()">${ic('check',16)} حفظ المسابقة</button></div>
+  <div class="card"><div class="sec-title"><span class="tic">${ic('star',17)}</span><h3>المسابقات</h3></div>
+  ${qs.length?qs.map(q=>`<div class="frow"><div class="grow"><b>${esc(q.title)}</b> ${st[q.status]||''}<div class="hint">${q.group_name?esc(q.group_name):'كل الشعب'} · ${esc(fmtDT(q.created_at))}</div></div>
+    <div class="row" style="gap:6px"><button class="btn sm" onclick="tQuizOpen(${q.id})">${q.status==='ended'?'النتيجة':'تحكم'}</button><button class="btn sm dan" onclick="tQuizDel(${q.id})">${ic('trash',14)}</button></div></div>`).join(''):'<div class="empty"><span class="eic">'+ic('star',24)+'</span>مفيش مسابقات لسه</div>'}</div>`;
+}
+async function tQuizCreate(){
+  const t=v('qz-t').trim(); if(!t) return toast('اكتب اسم المسابقة',true);
+  let items; try{ items=parseMcq(v('qz-q')); }catch(e){ return toast(errMsg(e),true); }
+  const secs=Math.min(120,Math.max(5,Math.round(Number(v('qz-s'))||20)));
+  let qid=null;
+  try{
+    const r=await api(sb.from('live_quiz').insert({title:t,group_name:v('qz-g')}).select('id'));
+    qid=r[0].id;
+    await api(sb.from('live_quiz_q').insert(items.map((x,i)=>({quiz_id:qid,ord:i+1,question:x.question,options:x.options,correct_index:x.correct_index,secs}))));
+    toast('اتحفظت المسابقة'); tQuizOpen(qid);
+  }catch(e){ if(qid) try{ await sb.from('live_quiz').delete().eq('id',qid); }catch(x){} toast(errMsg(e),true); }
+}
+async function tQuizDel(id){ if(!confirm('تحذف المسابقة ونتيجتها؟')) return; try{ await api(sb.from('live_quiz').delete().eq('id',id)); viewTeacher('quiz'); }catch(e){ toast(errMsg(e),true); } }
+async function tQuizStep(id,a){ try{ const r=await api(sb.rpc('quiz_step',{p_quiz:id,p_action:a})); if(!r.ok) throw new Error('الخطوة دي مش متاحة دلوقتي'); tQuizOpen.sig=''; await tQuizDraw(id); }catch(e){ toast(errMsg(e),true); } }
+async function tQuizOpen(id){
+  clearInterval(quizTimer); clearInterval(quizCd); tQuizOpen.sig='';
+  document.getElementById('tbody').innerHTML=`<div class="card"><div class="row"><button class="btn sm sec" onclick="clearInterval(quizTimer);viewTeacher('quiz')">${ic('back',15)} رجوع</button></div></div><div id="qz-live"></div>`;
+  await tQuizDraw(id);
+  quizTimer=setInterval(()=>tQuizDraw(id),3000);
+}
+async function tQuizDraw(id){
+  const el=document.getElementById('qz-live'); if(!el){ clearInterval(quizTimer); clearInterval(quizCd); return; }
+  try{
+    const [qr,qs,as,stu]=await Promise.all([ api(sb.from('live_quiz').select('*').eq('id',id)), api(sb.from('live_quiz_q').select('*').eq('quiz_id',id).order('ord')), api(sb.from('live_quiz_a').select('q_id,student_id,choice,points').eq('quiz_id',id)), api(sb.from('students').select('id,name,group_name,active')) ]);
+    const q=qr&&qr[0]; if(!q){ viewTeacher('quiz'); return; }
+    const cur=(qs||[]).find(x=>x.ord===q.cur_ord);
+    const elig=(stu||[]).filter(s=>s.active&&(!q.group_name||s.group_name===q.group_name));
+    const nm={}; (stu||[]).forEach(s=>nm[s.id]=s.name);
+    const ansCur=cur?(as||[]).filter(a=>a.q_id===cur.id):[];
+    const sig=JSON.stringify([q.status,q.phase,q.cur_ord,ansCur.length,(as||[]).length,elig.length]);
+    if(sig===tQuizOpen.sig) return; tQuizOpen.sig=sig;
+    const tot={}; (as||[]).forEach(a=>tot[a.student_id]=(tot[a.student_id]||0)+a.points);
+    const board=Object.entries(tot).sort((a,b)=>b[1]-a[1]);
+    const boardHtml=(n)=>`<div class="mt">${board.slice(0,n).map((b,i)=>`<div class="frow"><div class="avatar">${i+1}</div><div class="grow"><b>${esc(nm[b[0]]||'؟')}</b></div><span class="badge b">${b[1]}</span></div>`).join('')||'<div class="hint">لسه مفيش نقاط</div>'}</div>`;
+    let html=`<div class="card"><div class="sec-title"><span class="tic">${ic('star',17)}</span><h3>${esc(q.title)}</h3></div><div class="hint mb">${(qs||[]).length} سؤال · الطلبة المفعّلين في الشعبة: ${elig.length}</div>`;
+    if(q.status==='draft'){
+      html+=`<p>المسابقة لسه مخفية عن الطلبة. لما تفتحها هيشوفوا "استنى المدرس".</p><button class="btn" onclick="tQuizStep(${id},'open')">${ic('play',16)} افتح المسابقة للطلبة</button>`;
+    }else if(q.status==='ended'){
+      html+=`<div class="pendbar" style="background:#f0fdf4;border-color:#86efac;color:#166534">المسابقة خلصت. الترتيب النهائي:</div>${boardHtml(10)}`;
+    }else if(q.cur_ord===0){
+      html+=`<p>الطلبة بيدخلوا دلوقتي من تبويب "مسابقة مباشرة". لما الكل يبقى جاهز ابدأ.</p><button class="btn" onclick="tQuizStep(${id},'next')">${ic('play',16)} ابدأ السؤال 1</button> <button class="btn sm dan" onclick="tQuizStep(${id},'end')">إلغاء</button>`;
+    }else if(cur){
+      const last=q.cur_ord>=(qs||[]).length;
+      html+=`<div class="hint">سؤال ${q.cur_ord} من ${(qs||[]).length}</div><h3 style="margin:8px 0 12px">${esc(cur.question)}</h3>`;
+      const cnt=cur.options.map((_,i)=>ansCur.filter(a=>a.choice===i).length);
+      html+=cur.options.map((o,i)=>{const rv=q.phase==='revealed', ok=i===cur.correct_index; const w=ansCur.length?Math.round(cnt[i]*100/ansCur.length):0;
+        return `<div style="margin-bottom:8px;border-radius:12px;overflow:hidden;border:2px solid ${rv&&ok?'#16a34a':'var(--line)'};background:#fff;position:relative"><div style="position:absolute;inset:0;width:${rv?w:0}%;background:${rv&&ok?'#bbf7d0':'#e0e7ff'}"></div><div style="position:relative;padding:11px 14px;display:flex;justify-content:space-between;gap:8px"><span><b style="color:${QCOL[i]}">${'أبجدهو'[i]||i+1}</b> ${esc(o)}${rv&&ok?' ✔':''}</span>${rv?`<b>${cnt[i]}</b>`:''}</div></div>`;}).join('');
+      if(q.phase==='answering'){
+        html+=`<div class="row mt" style="gap:10px;align-items:center"><span class="badge b" id="qz-cd">--</span><span class="badge y">جاوب ${ansCur.length} من ${elig.length}</span><button class="btn sm" onclick="tQuizStep(${id},'reveal')">${ic('check',15)} اكشف الإجابة</button></div>`;
+      }else{
+        html+=`<div class="sec-title mt"><h3>الترتيب</h3></div>${boardHtml(5)}<div class="row mt"><button class="btn" onclick="tQuizStep(${id},'next')">${last?'إنهاء وعرض النتيجة النهائية':'السؤال التالي'}</button></div>`;
+      }
+    }
+    html+='</div>';
+    el.innerHTML=html;
+    clearInterval(quizCd);
+    if(q.phase==='answering'&&cur){ const end=Date.parse(q.q_started_at)+cur.secs*1000; const f=()=>{ const e=document.getElementById('qz-cd'); if(!e){ clearInterval(quizCd); return; } const l=Math.max(0,Math.ceil((end-Date.now())/1000)); e.textContent=l>0?('باقي '+l+' ثانية'):'الوقت خلص'; }; f(); quizCd=setInterval(f,500); }
+  }catch(e){}
+}
+
+/* ---- مسابقة مباشرة: الطالب ---- */
+let sqTimer=null, sqCd=null, sqSig='', sqEnd=0, sqLast=null;
+async function sQuiz(body){
+  clearInterval(sqTimer); clearInterval(sqCd); sqSig=''; sqLast=null;
+  body.innerHTML='<div id="sq-box"><div class="center" style="padding:24px"><div class="spin" style="border-color:var(--pri);border-top-color:transparent"></div></div></div>';
+  await sqPoll(); sqTimer=setInterval(sqPoll,3000);
+}
+async function sqPoll(){
+  const box=document.getElementById('sq-box'); if(!box||S.tab!=='quiz'){ clearInterval(sqTimer); clearInterval(sqCd); return; }
+  try{ sqRender(box,await api(sb.rpc('quiz_state'))); }catch(e){}
+}
+function sqRender(box,st){
+  st=st||{running:false};
+  if(st.phase==='answering'&&st.left!=null) sqEnd=Date.now()+st.left*1000;
+  if(st.phase==='revealed') sqLast=st;
+  const sig=JSON.stringify([st.running,st.quiz,st.phase,st.q,st.my_choice,st.answered]);
+  if(sig===sqSig) return; sqSig=sig; clearInterval(sqCd);
+  const head=`<div class="sec-title"><span class="tic">${ic('star',17)}</span><h3>${esc(st.title||'مسابقة مباشرة')}</h3></div>`;
+  let h='';
+  if(!st.running){
+    h=sqLast?`<div class="center"><h3>المسابقة خلصت</h3><p>مجموع نقاطك: <b>${sqLast.my_total}</b> · مركزك: <b>${sqLast.my_rank}</b></p></div>`:'<div class="empty"><span class="eic">'+ic('star',24)+'</span>مفيش مسابقة شغالة دلوقتي. الصفحة هتتحدّث لوحدها لما المدرس يبدأ.</div>';
+    box.innerHTML=`<div class="card">${h}</div>`; return;
+  }
+  if(st.phase==='lobby'){ box.innerHTML=`<div class="card center">${head}<p>استنى المدرس يبدأ السؤال الأول...</p><div class="spin" style="border-color:var(--pri);border-top-color:transparent;margin:10px auto"></div></div>`; return; }
+  const opts=(st.options||[]);
+  h=`${head}<div class="hint">سؤال ${st.ord} من ${st.total}</div><h3 style="margin:8px 0 14px">${esc(st.question)}</h3>`;
+  if(st.phase==='answering'||st.phase==='closed'){
+    const done=st.my_choice!=null;
+    h+=opts.map((o,i)=>`<button class="btn" style="width:100%;margin-bottom:9px;text-align:right;background:${QCOL[i]};opacity:${done&&st.my_choice!==i?.45:1};outline:${done&&st.my_choice===i?'3px solid #111':'0'}" ${done||st.phase==='closed'?'disabled':''} onclick="sqPick(${st.q},${i})">${'أبجدهو'[i]||i+1}. ${esc(o)}</button>`).join('');
+    if(st.phase==='answering') h+=done?'<div class="pendbar" style="background:#eef2ff;border-color:#a5b4fc;color:#3730a3">اتسجّلت إجابتك. استنى باقي الزمن والمدرس يكشف الإجابة.</div><div class="center"><span class="badge b" id="sq-cd"></span></div>':'<div class="center"><span class="badge b" id="sq-cd"></span></div>';
+    else h+='<div class="pendbar">الوقت خلص. استنى المدرس يكشف الإجابة.</div>';
+  }else{
+    h+=opts.map((o,i)=>{const ok=i===st.correct_index, mine=i===st.my_choice; return `<div style="padding:11px 14px;margin-bottom:8px;border-radius:12px;border:2px solid ${ok?'#16a34a':mine?'#dc2626':'var(--line)'};background:${ok?'#dcfce7':mine?'#fee2e2':'#fff'}">${'أبجدهو'[i]||i+1}. ${esc(o)}${ok?' ✔':''}${mine&&!ok?' (إجابتك)':''}</div>`;}).join('');
+    h+=`<div class="pendbar" style="background:${st.my_correct?'#f0fdf4':'#fef2f2'};border-color:${st.my_correct?'#86efac':'#fecaca'};color:${st.my_correct?'#166534':'#991b1b'}">${st.my_choice==null?'مجاوبتش على السؤال ده':st.my_correct?'إجابة صح! +'+st.my_points+' نقطة':'إجابة غلط'} · مجموعك ${st.my_total} · مركزك ${st.my_rank}</div>
+      <div class="sec-title mt"><h3>الأوائل</h3></div>${(st.board||[]).map((b,i)=>`<div class="frow"><div class="avatar">${i+1}</div><div class="grow"><b>${esc(b.n)}</b></div><span class="badge b">${b.pts}</span></div>`).join('')}`;
+  }
+  box.innerHTML=`<div class="card">${h}</div>`;
+  if(st.phase==='answering'){ const f=()=>{ const e=document.getElementById('sq-cd'); if(!e){ clearInterval(sqCd); return; } const l=Math.max(0,Math.ceil((sqEnd-Date.now())/1000)); e.textContent='باقي '+l+' ثانية'; }; f(); sqCd=setInterval(f,500); }
+}
+async function sqPick(q,i){
+  try{
+    const r=await api(sb.rpc('quiz_answer',{p_q:q,p_choice:i}));
+    if(!r.ok){ const m={late:'الوقت خلص',closed:'السؤال اتقفل',already:'جاوبت قبل كده',bad_choice:'اختيار غلط',no_student:'حسابك مش مفعّل'}; toast(m[r.error]||'تعذر تسجيل الإجابة',true); }
+  }catch(e){ toast(errMsg(e),true); }
+  sqSig=''; sqPoll();
+}
+
+/* ---- بنك الأسئلة: المدرس ---- */
+async function tQbank(body){
+  const [ls,qs]=await Promise.all([ api(sb.from('lessons').select('id,title,ord').order('ord')), api(sb.from('qbank').select('id,lesson_id,level,question,options,correct_index').order('id',{ascending:false}).limit(100)) ]);
+  const lt={}; (ls||[]).forEach(l=>lt[l.id]=l.title);
+  const lopt='<option value="">أسئلة عامة (من غير درس)</option>'+(ls||[]).map(l=>`<option value="${l.id}">${esc(l.title)}</option>`).join('');
+  const lv='<option value="easy">سهل</option><option value="medium">متوسط</option><option value="hard">صعب</option>';
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('plus',17)}</span><h3>إضافة أسئلة للبنك</h3></div>
+    <p class="mut">الطلبة بيتدربوا عليها حسب الدرس والمستوى وتقدمهم بيتحسب، وتحدي اليوم بيختار منها سؤال كل يوم.</p>
+    <div class="row mb"><div class="field grow"><label>الدرس</label><select id="qb-l">${lopt}</select></div><div class="field grow"><label>المستوى</label><select id="qb-v">${lv}</select></div></div>
+    <div class="field"><label>الأسئلة (كل سؤال في سطر، الصيغة: ${MCQ_FMT})</label><textarea id="qb-t" rows="6" placeholder="إيه ناتج print(2*3)؟ | 5 | 6 | 23 | 2"></textarea></div>
+    <div class="field"><label>شرح الإجابة (اختياري، بيظهر للطالب بعد ما يجاوب، لو بتضيف سؤال واحد)</label><input id="qb-e" maxlength="1000"></div>
+    <button class="btn sm" onclick="tQbankAdd()">${ic('check',16)} إضافة</button></div>
+  <div class="card"><div class="sec-title"><span class="tic">${ic('book',17)}</span><h3>أسئلة البنك (${(qs||[]).length}${(qs||[]).length>=100?'+':''})</h3></div>
+  ${(qs||[]).length?qs.map(q=>`<div class="frow"><div class="grow"><b>${esc(q.question)}</b><div class="hint">${q.lesson_id?esc(lt[q.lesson_id]||'درس محذوف'):'عام'} · ${LVL[q.level]} · الصحيحة: ${esc(q.options[q.correct_index])}</div></div><button class="btn sm dan" onclick="tQbankDel(${q.id})">${ic('trash',14)}</button></div>`).join(''):'<div class="empty"><span class="eic">'+ic('book',24)+'</span>البنك فاضي</div>'}</div>`;
+}
+async function tQbankAdd(){
+  let items; try{ items=parseMcq(v('qb-t')); }catch(e){ return toast(errMsg(e),true); }
+  const l=v('qb-l'), ex=v('qb-e').trim();
+  try{ await api(sb.from('qbank').insert(items.map(x=>({lesson_id:l?Number(l):null,level:v('qb-v'),question:x.question,options:x.options,correct_index:x.correct_index,explanation:items.length===1?ex:''})))); toast('اتضافت '+items.length+' سؤال'); viewTeacher('qbank'); }catch(e){ toast(errMsg(e),true); }
+}
+async function tQbankDel(id){ if(!confirm('تحذف السؤال؟')) return; try{ await api(sb.from('qbank').delete().eq('id',id)); viewTeacher('qbank'); }catch(e){ toast(errMsg(e),true); } }
+
+/* ---- بنك التدريب: الطالب ---- */
+let qbS={qs:[],i:0,ok:0,answered:false};
+async function sQb(body){
+  const meta=(await api(sb.rpc('qb_meta')))||[];
+  if(!meta.length){ body.innerHTML='<div class="card"><div class="empty"><span class="eic">'+ic('book',24)+'</span>مفيش أسئلة تدريب لسه. المدرس هيضيفها قريب.</div></div>'; return; }
+  const by={}; meta.forEach(m=>{ const k=m.lesson==null?-1:m.lesson; (by[k]=by[k]||{title:m.title,lv:{}}).lv[m.level]=m; });
+  const all={}; meta.forEach(m=>{ const a=all[m.level]=all[m.level]||{total:0,solved:0}; a.total+=m.total; a.solved+=m.solved; });
+  const card=(k,title,lv)=>`<div class="card"><div class="sec-title"><span class="tic">${ic('book',17)}</span><h3>${esc(title)}</h3></div>${['easy','medium','hard'].filter(l=>lv[l]).map(l=>{const m=lv[l]; const p=m.total?Math.round(m.solved*100/m.total):0;
+    return `<div class="frow"><div class="grow"><b>${LVL[l]}</b><div class="hint">حليت ${m.solved}/${m.total}</div><div style="height:7px;background:#e5e7eb;border-radius:9px;margin-top:5px;overflow:hidden"><div style="height:100%;width:${p}%;background:var(--pri)"></div></div></div><button class="btn sm" onclick="sQbStart(${k},'${l}')">تدرّب</button></div>`;}).join('')}</div>`;
+  body.innerHTML=`<div id="qb-run"></div><div id="qb-list">${card(0,'كل الدروس',all)}${Object.keys(by).map(k=>card(Number(k),by[k].title,by[k].lv)).join('')}</div>`;
+}
+async function sQbStart(lesson,level){
+  try{
+    const qs=(await api(sb.rpc('qb_questions',{p_lesson:lesson,p_level:level})))||[];
+    if(!qs.length) return toast('مفيش أسئلة هنا',true);
+    qbS={qs,i:0,ok:0,answered:false}; document.getElementById('qb-list').style.display='none'; sQbShow();
+  }catch(e){ toast(errMsg(e),true); }
+}
+function sQbShow(){
+  const el=document.getElementById('qb-run'); if(!el) return;
+  if(qbS.i>=qbS.qs.length){ el.innerHTML=`<div class="card center"><h3>خلصت التدريب</h3><p>إجاباتك الصح: <b>${qbS.ok}/${qbS.qs.length}</b></p><button class="btn" onclick="viewStudent('qb')">رجوع للبنك</button></div>`; return; }
+  const q=qbS.qs[qbS.i]; qbS.answered=false;
+  el.innerHTML=`<div class="card"><div class="hint">سؤال ${qbS.i+1} من ${qbS.qs.length}</div><h3 style="margin:8px 0 12px">${esc(q.question)}</h3>
+    ${q.options.map((o,i)=>`<button class="btn sec" id="qbo-${i}" style="width:100%;margin-bottom:8px;text-align:right" onclick="sQbPick(${q.id},${i})">${'أبجدهو'[i]||i+1}. ${esc(o)}</button>`).join('')}<div id="qb-fb"></div></div>`;
+}
+async function sQbPick(id,i){
+  if(qbS.answered) return; qbS.answered=true;
+  try{
+    const r=await api(sb.rpc('qb_answer',{p_q:id,p_choice:i})); if(!r.ok) throw new Error('تعذر تسجيل الإجابة');
+    if(r.correct) qbS.ok++;
+    document.querySelectorAll('[id^=qbo-]').forEach(b=>{ b.disabled=true; });
+    const ok=document.getElementById('qbo-'+r.correct_index); if(ok){ ok.style.background='#dcfce7'; ok.style.borderColor='#16a34a'; }
+    if(!r.correct){ const w=document.getElementById('qbo-'+i); if(w){ w.style.background='#fee2e2'; w.style.borderColor='#dc2626'; } }
+    document.getElementById('qb-fb').innerHTML=`<div class="pendbar" style="background:${r.correct?'#f0fdf4':'#fef2f2'};border-color:${r.correct?'#86efac':'#fecaca'};color:${r.correct?'#166534':'#991b1b'}">${r.correct?'إجابة صح':'إجابة غلط'}${r.explanation?' · '+esc(r.explanation):''}</div><button class="btn mt" onclick="qbS.i++;sQbShow()">${qbS.i+1>=qbS.qs.length?'النتيجة':'السؤال التالي'}</button>`;
+  }catch(e){ toast(errMsg(e),true); qbS.answered=false; }
+}
+
+/* ---- تحدي اليوم ---- */
+async function sDaily(body){
+  const d=await api(sb.rpc('daily_get')); if(!d) throw new Error('حسابك مش مفعّل');
+  const st=d.stats||{streak:0,best:0,days:0,correct_days:0};
+  const stats=`<div class="row mb" style="gap:10px;flex-wrap:wrap"><span class="badge g">${ic('spark',13)} ${st.streak} ${st.streak===1?'يوم':'أيام'} ورا بعض</span><span class="badge b">أحسن سلسلة ${st.best}</span><span class="badge y">صح ${st.correct_days} من ${st.days}</span></div>`;
+  if(!d.has){ body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('spark',17)}</span><h3>تحدي اليوم</h3></div>${stats}<div class="empty">مفيش تحدي النهارده. المدرس لسه ما ضافش أسئلة.</div></div>`; return; }
+  let h=`<div class="card"><div class="sec-title"><span class="tic">${ic('spark',17)}</span><h3>تحدي اليوم</h3></div>${stats}<p class="mut">جاوب كل يوم عشان سلسلتك متتقطعش. السلسلة بتتحسب بالأيام اللي جاوبت فيها (صح أو غلط) بتوقيت القاهرة.</p><h3 style="margin:8px 0 12px">${esc(d.question)}</h3>`;
+  if(!d.answered) h+=d.options.map((o,i)=>`<button class="btn sec" style="width:100%;margin-bottom:8px;text-align:right" onclick="sDailyPick(${i})">${'أبجدهو'[i]||i+1}. ${esc(o)}</button>`).join('');
+  else{
+    h+=d.options.map((o,i)=>{const ok=i===d.correct_index, mine=i===d.choice; return `<div style="padding:11px 14px;margin-bottom:8px;border-radius:12px;border:2px solid ${ok?'#16a34a':mine?'#dc2626':'var(--line)'};background:${ok?'#dcfce7':mine?'#fee2e2':'#fff'}">${'أبجدهو'[i]||i+1}. ${esc(o)}${ok?' ✔':''}</div>`;}).join('');
+    h+=`<div class="pendbar" style="background:${d.correct?'#f0fdf4':'#fef2f2'};border-color:${d.correct?'#86efac':'#fecaca'};color:${d.correct?'#166534':'#991b1b'}">${d.correct?'إجابة صح!':'إجابة غلط'}${d.explanation?' · '+esc(d.explanation):''}<br>تعالى بكرة لتحدي جديد.</div>`;
+  }
+  body.innerHTML=h+'</div>';
+}
+async function sDailyPick(i){
+  try{ const r=await api(sb.rpc('daily_answer',{p_choice:i})); if(!r.ok&&r.error!=='already') throw new Error('تعذر تسجيل الإجابة'); viewStudent('daily'); }catch(e){ toast(errMsg(e),true); }
+}
+
+/* ---- المشاريع ---- */
+let projPic='';
+async function sProj(body){
+  projPic='';
+  const [mine,gal]=await Promise.all([ api(sb.from('projects').select('id,title,description,link,has_image,shown,created_at').order('id',{ascending:false})), api(sb.rpc('gallery')) ]);
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('plus',17)}</span><h3>ارفع مشروعك</h3></div>
+    <p class="mut">المدرس بيختار أحسن المشاريع وتظهر لزمايلك في شعبتك. تقدر ترفع لحد 5 مشاريع.</p>
+    <div class="field"><label>اسم المشروع</label><input id="pj-t" maxlength="120"></div>
+    <div class="field"><label>وصف قصير (اختياري)</label><textarea id="pj-d" rows="3" maxlength="1000"></textarea></div>
+    <div class="field"><label>رابط المشروع (اختياري، رابط آمن https)</label><input id="pj-l" maxlength="300" style="direction:ltr;text-align:left" placeholder="https://..."></div>
+    <div class="field"><label>الكود (اختياري)</label><textarea id="pj-c" rows="6" spellcheck="false" style="direction:ltr;text-align:left;font-family:Consolas,monospace"></textarea></div>
+    <div class="field"><label>صورة للمشروع (اختياري)</label><div id="pj-prev" class="mb"></div><input type="file" accept="image/*" onchange="projPick(this)"></div>
+    <button class="btn" id="pj-send" onclick="sProjAdd()">${ic('check',16)} رفع المشروع</button></div>
+  <div class="card"><div class="sec-title"><span class="tic">${ic('code',17)}</span><h3>مشاريعي</h3></div>
+  ${(mine||[]).length?mine.map(p=>`<div class="frow"><div class="grow"><b>${esc(p.title)}</b><div class="hint">${p.shown?'<span class="badge g">معروض لزمايلك</span>':'<span class="badge y">مستني اختيار المدرس</span>'}</div></div><button class="btn sm dan" onclick="sProjDel(${p.id})">${ic('trash',14)}</button></div>`).join(''):'<div class="empty">لسه مرفعتش مشاريع</div>'}</div>
+  <div class="card"><div class="sec-title"><span class="tic">${ic('medal',17)}</span><h3>معرض الشعبة</h3></div>
+  ${(gal||[]).length?gal.map(g=>`<div class="frow" style="align-items:flex-start;flex-direction:column;gap:6px"><div><b>${esc(g.title)}</b> <span class="hint">· ${esc(g.name)}${g.mine?' (انت)':''}</span></div>
+    ${g.image?`<img src="${g.image}" onclick="imgBox(this.src)" style="max-width:100%;max-height:220px;border-radius:12px;border:1px solid var(--line);cursor:pointer">`:''}
+    ${g.description?`<div style="white-space:pre-wrap">${esc(g.description)}</div>`:''}
+    ${/^https:\/\/\S+$/.test(g.link||'')?`<a class="btn sm sec" target="_blank" rel="noopener noreferrer" href="${esc(g.link)}">${ic('play',14)} افتح المشروع</a>`:''}
+    ${g.code?`<details style="width:100%"><summary class="hint" style="cursor:pointer">شوف الكود</summary><pre class="toolout" style="display:block;max-height:260px;white-space:pre-wrap;direction:ltr;text-align:left">${esc(g.code)}</pre></details>`:''}</div>`).join(''):'<div class="empty">مفيش مشاريع معروضة لسه</div>'}</div>`;
+}
+async function projPick(inp){
+  const f=inp.files[0]; inp.value=''; if(!f) return;
+  try{ projPic=await imgToJpeg(f); document.getElementById('pj-prev').innerHTML=`<img src="${projPic}" style="max-height:110px;border-radius:10px">`; }catch(e){ toast(errMsg(e),true); }
+}
+async function sProjAdd(){
+  const t=v('pj-t').trim(); if(!t) return toast('اكتب اسم المشروع',true);
+  const l=v('pj-l').trim(); if(l&&!/^https:\/\/\S+$/.test(l)) return toast('الرابط لازم يبدأ بـ https://',true);
+  const b=document.getElementById('pj-send'); b.disabled=true;
+  try{
+    const r=await api(sb.rpc('add_project',{p_title:t,p_desc:v('pj-d'),p_link:l,p_code:v('pj-c'),p_image:projPic}));
+    if(!r.ok){ const m={too_many:'وصلت للحد الأقصى (5 مشاريع). امسح مشروع قديم.',bad_link:'الرابط غير صالح',bad_image:'الصورة غير صالحة',too_long:'النص طويل',bad_title:'اسم المشروع غير صالح',no_student:'حسابك مش مفعّل'}; throw new Error(m[r.error]||'تعذر الرفع'); }
+    toast('اترفع المشروع'); viewStudent('proj');
+  }catch(e){ toast(errMsg(e),true); b.disabled=false; }
+}
+async function sProjDel(id){ if(!confirm('تمسح المشروع؟')) return; try{ await api(sb.rpc('del_project',{p_id:id})); viewStudent('proj'); }catch(e){ toast(errMsg(e),true); } }
+
+async function tProj(body){
+  const [ps,stu]=await Promise.all([ api(sb.from('projects').select('id,student_id,title,description,link,code,has_image,shown,created_at').order('id',{ascending:false})), api(sb.from('students').select('id,name,group_name')) ]);
+  const nm={}; (stu||[]).forEach(s=>nm[s.id]=s);
+  body.innerHTML=`<div class="card"><div class="sec-title"><span class="tic">${ic('code',17)}</span><h3>مشاريع الطلاب (${(ps||[]).length})</h3></div>
+    <p class="mut">اختار المشاريع اللي تظهر لزمايل الطالب في نفس الشعبة. اللي مش معروض مش بيشوفه غيرك وصاحبه.</p>
+  ${(ps||[]).length?ps.map(p=>{const s=nm[p.student_id]||{};return `<div class="frow" style="flex-wrap:wrap;align-items:flex-start"><div class="grow"><b>${esc(p.title)}</b> ${p.shown?'<span class="badge g">معروض</span>':'<span class="badge y">مخفي</span>'}<div class="hint">${esc(s.name||'؟')}${s.group_name?' · '+esc(s.group_name):''} · ${esc(fmtDT(p.created_at))}</div>
+      ${p.description?`<div style="white-space:pre-wrap">${esc(p.description)}</div>`:''}
+      ${/^https:\/\/\S+$/.test(p.link||'')?`<a target="_blank" rel="noopener noreferrer" href="${esc(p.link)}" style="direction:ltr;display:inline-block;word-break:break-all">${esc(p.link)}</a>`:''}
+      ${p.code?`<details><summary class="hint" style="cursor:pointer">الكود</summary><pre class="toolout" style="display:block;max-height:240px;white-space:pre-wrap;direction:ltr;text-align:left">${esc(p.code)}</pre></details>`:''}
+      ${p.has_image?`<div><button class="btn sm sec" onclick="tProjImg(${p.id},this)">${ic('img',14)} عرض الصورة</button><div id="pimg-${p.id}"></div></div>`:''}</div>
+      <div class="row" style="gap:6px"><button class="btn sm ${p.shown?'sec':''}" onclick="tProjShow(${p.id},${!p.shown})">${p.shown?'إخفاء':'اعرضه للزملاء'}</button><button class="btn sm dan" onclick="tProjDel(${p.id})">${ic('trash',14)}</button></div></div>`;}).join(''):'<div class="empty"><span class="eic">'+ic('code',24)+'</span>مفيش مشاريع لسه</div>'}</div>`;
+}
+async function tProjImg(id,btn){ try{ const r=await api(sb.from('projects').select('image').eq('id',id)); document.getElementById('pimg-'+id).innerHTML=`<img src="${r[0].image}" onclick="imgBox(this.src)" style="max-width:100%;max-height:200px;border-radius:10px;margin-top:6px;cursor:pointer">`; btn.disabled=true; }catch(e){ toast(errMsg(e),true); } }
+async function tProjShow(id,s){ try{ await api(sb.from('projects').update({shown:s}).eq('id',id)); viewTeacher('proj'); }catch(e){ toast(errMsg(e),true); } }
+async function tProjDel(id){ if(!confirm('تحذف المشروع؟')) return; try{ await api(sb.from('projects').delete().eq('id',id)); viewTeacher('proj'); }catch(e){ toast(errMsg(e),true); } }
+
+/* ---- الرئيسية: تحدي اليوم والمسابقة ---- */
+const _studentHomeB4=studentHome;
+studentHome=async function(body){
+  await _studentHomeB4(body);
+  try{
+    const [d,q]=await Promise.all([ api(sb.rpc('daily_get')), api(sb.rpc('quiz_state')) ]);
+    const items=[];
+    if(q&&q.running) items.push(`<div class="anrow"><span>${ic('star',15)} فيه مسابقة مباشرة شغالة دلوقتي: ${esc(q.title)}</span><button class="btn sm" onclick="viewStudent('quiz')">ادخل</button></div>`);
+    if(d&&d.has) items.push(`<div class="anrow"><span>${ic('spark',15)} ${d.answered?'خلصت تحدي النهارده':'تحدي النهارده مستنيك'} · سلسلتك ${d.stats.streak} ${d.stats.streak===1?'يوم':'أيام'}</span>${d.answered?'':`<button class="btn sm" onclick="viewStudent('daily')">جاوب</button>`}</div>`);
+    if(items.length) body.insertAdjacentHTML('afterbegin',`<div class="card"><div class="sec-title"><span class="tic">${ic('spark',17)}</span><h3>النهارده</h3></div>${items.join('')}</div>`);
+  }catch(e){}
+};
 
 </script>
 <script>boot();</script>
